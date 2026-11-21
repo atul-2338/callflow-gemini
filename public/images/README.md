@@ -1,33 +1,44 @@
-# Image drop-zone
+# Images — replace these files, keep the names
 
-Drop these **four local files** here (do not hotlink external URLs — the pages reference
-same-origin paths only):
+The four JPEGs in this folder are **on-brand placeholders** (navy + metallic gold, 1200 × 675).
+They are local files — nothing on the site hotlinks an external URL. To use your own photos,
+**overwrite these exact filenames** and the pages pick them up automatically. No HTML edits needed.
 
-| File | Used on | Recommended size | Notes |
+| Filename | Placeholder shows | Swap in | Used on |
 |---|---|---|---|
-| `slider-1.jpg` | Homepage slider, slide 1 | 1200 × 675 (16:9) | plumber under a sink / leak repair |
-| `slider-2.jpg` | Homepage slider, slide 2 | 1200 × 675 (16:9) | water heater replacement |
-| `slider-3.jpg` | Homepage slider, slide 3 | 1200 × 675 (16:9) | drain clearing |
-| `plumber-austin.jpg` | `/austin` + all `/austin/<city>` pages | 1200 × 675 (16:9) | one generic Austin plumbing photo |
+| `slider-1.jpg` | “Female plumber · under-sink repair” | Your female plumber under a sink | Homepage slider, slide 1 |
+| `slider-2.jpg` | “Water heater swap · garage job site” | Job-site water heater shot | Homepage slider, slide 2 |
+| `slider-3.jpg` | “Drain clearing · bathroom job site” | Job-site drain/bathroom shot | Homepage slider, slide 3 |
+| `plumber-austin.jpg` | “Plumber on an Austin job” | Wide female-plumber / job-site hero | `/austin` and all six `/austin/<city>` pages |
 
-## Adding them
+## How to swap
 
 ```bash
-# from the repo root, after copying the files into public/images/
+# copy your photos in, keeping these exact names
+copy slider-1.jpg public\images\slider-1.jpg     # Windows
+# or:  cp slider-1.jpg public/images/slider-1.jpg   (macOS/Linux)
+
 git add public/images/*.jpg
-git commit -m "images: add homepage slider + Austin plumbing photo"
+git commit -m "images: swap in real plumber photos"
 git push
 ```
 
-## Rules that keep the pages fast and stable
+## Format rules
 
-- **16:9 / 1200×675.** The markup already declares `width="1200" height="675"` and the CSS uses
-  `aspect-ratio: 16 / 9`, so the box is reserved before the image loads — no layout shift (CLS 0).
-- **Keep each file under ~250 KB.** Resize/compress first (`squoosh.app` or
-  `magick photo.jpg -resize 1200x675 -quality 82 photo.jpg`).
-- **JPEG (or rename to `.webp` and update the `src` in `public/index.html` and `city-pages.js`).**
-- **Missing file?** The image hides itself (`onerror`) and the gold/navy gradient in
-  `.cf-slide` / `.photo-figure` shows instead, so a not-yet-added photo never renders as a broken
-  icon and never shifts the layout.
-- Files here are **committed** (the repo `.gitignore` only excludes the database, `.env`,
-  `node_modules` and logs).
+- **1200 × 675 (16:9), JPEG, under ~250 KB.** The markup declares `width="1200" height="675"` and
+  the CSS uses `aspect-ratio: 16 / 9`, so the box is reserved before the photo loads — **no layout
+  shift**. A different aspect ratio will crop (the CSS uses `object-fit: cover`), not stretch.
+- Compress before committing: `magick photo.jpg -resize 1200x675^ -gravity center -extent 1200x675 -quality 82 photo.jpg`
+- Using `.webp`? Rename the files **and** update the four `src` paths in `public/index.html`
+  (slider) and `photoHtml()` in `city-pages.js` (city pages).
+
+## If a file is missing or misnamed
+
+The `<img>` hides itself (`onerror`) and the navy/gold gradient behind it shows — no broken-image
+icon and no layout jump. Nothing 500s.
+
+## Where the alt text lives (update it if the photo changes)
+
+- Homepage slider: `public/index.html` → `alt="..."` on the three `cf-slide` images.
+- City pages: `city-pages.js` → `photoHtml()` → the `alt` string, which is built per city
+  (`Plumber repairing a leaking pipe under a kitchen sink in {City}, TX`).

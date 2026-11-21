@@ -425,17 +425,23 @@
   .cf-slide figcaption { position: absolute; inset: auto 0 0 0; margin: 0; padding: 14px 16px;
     background: linear-gradient(to top, rgba(13,27,42,.9), rgba(13,27,42,0));
     color: #E8EEF6; font-size: 12.5px; font-weight: 700; }
-  .cf-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px;
-    display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(226,169,59,.5);
-    background: rgba(13,27,42,.75); color: #E2A93B; font-size: 20px; line-height: 1;
-    cursor: pointer; padding: 0; }
-  .cf-nav:hover { background: #E2A93B; color: #0D1B2A; }
+  .cf-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px;
+    display: grid; place-items: center; border-radius: 50%; font-size: 20px; line-height: 1;
+    cursor: pointer; padding: 0; color: #0D1B2A;
+    background: linear-gradient(160deg, #F3C96B 0%, #E2A93B 48%, #B8862A 100%);
+    border: 1px solid rgba(255, 236, 190, .75);
+    box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .85), inset 0 1px 0 rgba(255, 255, 255, .55); }
+  .cf-nav:hover { background: linear-gradient(160deg, #FBE0A3 0%, #EDBA55 48%, #C9922F 100%); }
+  .cf-nav:active { transform: translateY(-50%) scale(.96); }
+  .cf-nav:focus-visible { outline: 2px solid #F3C96B; outline-offset: 2px; }
   .cf-prev { left: 10px; }
   .cf-next { right: 10px; }
   .cf-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
   .cf-dot { width: 9px; height: 9px; padding: 0; border-radius: 50%; cursor: pointer;
-    border: 1px solid rgba(226,169,59,.6); background: transparent; }
-  .cf-dot.is-active { background: #E2A93B; border-color: #E2A93B; }
+    border: 1px solid rgba(226,169,59,.6); background: transparent; transition: transform .2s ease, background .2s ease; }
+  .cf-dot:hover { transform: scale(1.25); }
+  .cf-dot.is-active { background: linear-gradient(160deg, #F3C96B, #E2A93B 60%, #B8862A);
+    border-color: #F3C96B; box-shadow: 0 0 0 3px rgba(226,169,59,.2); }
   @media (max-width: 640px) {
     .cf-nav { width: 32px; height: 32px; font-size: 17px; }
     .cf-slide figcaption { font-size: 11.5px; padding: 10px 12px; }
