@@ -1,0 +1,17 @@
+{
+  "name": "callflow-austin-mvp",
+  "version": "1.0.0",
+  "description": "CallFlow missed-call PWA and dispatch backend for Austin plumbers",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "vapid": "node -e \"import('web-push').then(w => console.log(w.default.generateVAPIDKeys()))\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "web-push": "^3.6.7"
+  }
+}

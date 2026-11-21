@@ -1,0 +1,2653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CallFlow Workspace · Austin Missed-Call Dispatch</title>
+<meta name="description" content="Signed-in CallFlow workspace for Austin plumbing shops: live missed-call leads, AI agent setup, bookings, billing and dispatch." />
+<meta name="theme-color" content="#0D1B2A" />
+<meta name="color-scheme" content="dark light" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/icon.svg" />
+<link rel="preload" as="image" href="/assets/hero-plumber.jpg" fetchpriority="high" />
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-2: #122235;
+    --navy-3: #16283E;
+    --navy-4: #1B2E46;
+    --gold: #E2A93B;
+    --gold-2: #F3C96B;
+    --gold-3: #B07C1F;
+    --gold-ink: #7C5312;
+    --gold-soft: rgba(226, 169, 59, 0.14);
+    --white: #FFFFFF;
+    --off: #F8FAFC;
+    --slate: #475569;
+    --slate-2: #64748B;
+    --line: #E2E8F0;
+    --line-2: #CBD5E1;
+    --ok: #15803D;
+    --ok-bg: #DCFCE7;
+    --danger: #B42318;
+    --danger-bg: #FEE4E2;
+    --info: #1D4ED8;
+    --info-bg: #E8F1FF;
+    --warn: #92400E;
+    --warn-bg: #FEF3C7;
+    --radius: 18px;
+    --shadow: 0 18px 50px -24px rgba(2, 8, 20, 0.55);
+    --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 24px -16px rgba(15, 23, 42, 0.25);
+    --max: 1200px;
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--navy); color: #E8EEF6;
+    font-family: var(--font); font-size: 15px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p { margin: 0; }
+  a { color: inherit; }
+  button { font-family: inherit; }
+  img { max-width: 100%; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+  .wrap { width: 100%; max-width: var(--max); margin: 0 auto; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .spread { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .stack { display: grid; gap: 16px; }
+  .muted { color: var(--slate-2); }
+  .small { font-size: 12px; }
+  .tiny { font-size: 11px; }
+  .mono, .num { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* ---------- app bar ---------- */
+  .appbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13, 27, 42, 0.97);
+    border-bottom: 1px solid rgba(226, 169, 59, 0.22);
+    box-shadow: 0 10px 34px -22px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .appbar-inner {
+    max-width: var(--max); margin: 0 auto; padding: 11px 20px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+  .brand-mark {
+    flex: none; width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center;
+    background: linear-gradient(145deg, var(--gold-2) 0%, var(--gold) 55%, #C08A28 100%);
+    color: var(--navy); box-shadow: 0 8px 22px -12px rgba(226, 169, 59, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .brand-title { font-size: 17px; font-weight: 850; letter-spacing: -0.02em; color: #fff; white-space: nowrap; }
+  .brand-title span { color: var(--gold); font-weight: 750; }
+  .brand-sub { font-size: 11px; color: #94A3B8; margin-top: 1px; overflow-wrap: anywhere; }
+  .nav-scroll { flex: 1 1 420px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav {
+    display: flex; gap: 4px; min-width: max-content; padding: 4px;
+    background: rgba(22, 40, 62, 0.62); border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 14px;
+  }
+  .nav-pill {
+    appearance: none; border: 1px solid transparent; background: transparent; color: #CBD5E1;
+    font: inherit; font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em;
+    padding: 9px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .nav-pill:hover { color: #fff; background: rgba(27, 46, 70, 0.85); }
+  .nav-pill[aria-selected="true"], .nav-pill.is-active {
+    background: var(--navy-4); border-color: rgba(226, 169, 59, 0.55); color: var(--gold);
+    box-shadow: inset 0 0 0 1px rgba(226, 169, 59, 0.12);
+  }
+  .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-left: auto; }
+  .profile-menu { position: relative; }
+  .profile-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 5px 9px 5px 5px;
+    border-radius: 12px; border: 1px solid rgba(226, 169, 59, 0.4);
+    background: rgba(27, 46, 70, 0.72); color: #fff; cursor: pointer;
+  }
+  .profile-btn:hover { border-color: rgba(226, 169, 59, 0.7); background: var(--navy-4); }
+  .profile-avatar {
+    flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    background: linear-gradient(145deg, var(--gold-2), var(--gold)); color: var(--navy);
+    font-size: 12px; font-weight: 900;
+  }
+  .profile-meta { text-align: left; line-height: 1.15; min-width: 0; max-width: 132px; }
+  .profile-meta strong { display: block; font-size: 10.5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .profile-meta small { display: block; font-size: 9px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .profile-drop {
+    position: absolute; right: 0; top: calc(100% + 8px); z-index: 90; width: 240px;
+    background: #fff; color: var(--navy); border: 1px solid var(--line);
+    border-radius: 13px; padding: 6px; box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.65);
+  }
+  .profile-drop[hidden] { display: none; }
+  .drop-head { padding: 8px 10px 9px; border-bottom: 1px solid var(--line); margin-bottom: 5px; }
+  .drop-head strong { display: block; font-size: 12px; font-weight: 850; color: var(--navy); }
+  .drop-head span { display: block; font-size: 10px; color: var(--slate-2); margin-top: 1px; overflow-wrap: anywhere; }
+  .profile-drop button {
+    display: flex; align-items: center; width: 100%; border: 0; background: transparent;
+    color: var(--navy); font: inherit; font-size: 11.5px; font-weight: 750;
+    padding: 9px 10px; border-radius: 8px; cursor: pointer; text-align: left;
+  }
+  .profile-drop button:hover { background: var(--off); }
+  .profile-drop #logoutBtn { color: var(--danger); }
+
+  .statusbar { background: var(--navy-2); border-bottom: 1px solid rgba(148, 163, 184, 0.12); }
+  .statusbar-inner {
+    max-width: var(--max); margin: 0 auto; padding: 8px 20px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+    font-size: 11.5px; color: #94A3B8;
+  }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700;
+    color: #CBD5E1; background: rgba(27, 46, 70, 0.65); border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+  }
+  .status-pill i { width: 7px; height: 7px; border-radius: 50%; background: #64748B; display: inline-block; }
+  .status-pill.is-ok i { background: #22C55E; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16); }
+  .status-pill.is-warn i { background: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.16); }
+  .live { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; color: #CBD5E1; font-size: 11px; font-weight: 600; }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: #22C55E; display: inline-block; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16); }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    background: #fff; color: var(--navy); border: 1px solid var(--line-2);
+    font: inherit; font-size: 12.5px; font-weight: 750; letter-spacing: 0.01em;
+    padding: 10px 15px; border-radius: 11px; cursor: pointer; text-decoration: none;
+    white-space: nowrap; box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.05s ease;
+  }
+  .btn:hover { background: var(--off); border-color: var(--slate-2); }
+  .btn:active { transform: translateY(1px); }
+  .btn[disabled] { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+    border-color: #C99533; color: var(--navy);
+    box-shadow: 0 10px 24px -14px rgba(226, 169, 59, 0.85);
+  }
+  .btn-primary:hover { background: var(--gold-2); border-color: var(--gold); }
+  .btn-dark { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .btn-dark:hover { background: var(--navy-3); border-color: var(--navy-4); color: #fff; }
+  .btn-outline-gold {
+    background: rgba(226, 169, 59, 0.06); border-color: rgba(226, 169, 59, 0.55);
+    color: var(--gold); box-shadow: none;
+  }
+  .btn-outline-gold:hover { background: rgba(226, 169, 59, 0.14); border-color: var(--gold); color: var(--gold-2); }
+  .btn-ghost { background: transparent; border-color: transparent; color: #94A3B8; box-shadow: none; }
+  .btn-ghost:hover { background: rgba(148, 163, 184, 0.12); color: #fff; }
+  .btn-sm { padding: 7px 10px; font-size: 11.5px; border-radius: 9px; }
+  .btn-block { width: 100%; }
+
+  /* ---------- page + cards ---------- */
+  .page { max-width: var(--max); margin: 0 auto; padding: 22px 20px 64px; }
+  .view[hidden] { display: none; }
+  .card {
+    background: #fff; color: var(--navy); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-soft);
+  }
+  .card-dark {
+    background: linear-gradient(165deg, var(--navy-3) 0%, #101F33 100%);
+    color: #E8EEF6; border: 1px solid rgba(226, 169, 59, 0.24); box-shadow: var(--shadow);
+  }
+  .card-head {
+    display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+    gap: 10px; padding: 18px 20px 0;
+  }
+  .card-body { padding: 16px 20px 20px; }
+  .card-title { font-size: 15.5px; font-weight: 800; letter-spacing: -0.015em; }
+  .card-desc { font-size: 12px; color: var(--slate-2); margin-top: 3px; }
+  .card-dark .card-title { color: #fff; }
+  .card-dark .card-desc { color: #94A3B8; }
+  .card-kicker { font-size: 10px; font-weight: 850; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-ink); }
+  .card-dark .card-kicker { color: var(--gold); }
+  .divider { height: 1px; background: var(--line); border: 0; margin: 14px 0; }
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative; overflow: hidden; border-radius: 24px; padding: clamp(22px, 4vw, 46px);
+    background:
+      radial-gradient(900px 480px at 82% -12%, rgba(226, 169, 59, 0.17), transparent 62%),
+      linear-gradient(150deg, #0D1B2A 0%, #102135 62%, #0B1725 100%);
+    border: 1px solid rgba(226, 169, 59, 0.24); box-shadow: var(--shadow);
+    display: grid; gap: clamp(22px, 4vw, 46px); align-items: center;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: auto -130px -190px auto; width: 440px; height: 440px;
+    background: radial-gradient(circle, rgba(226, 169, 59, 0.16), transparent 66%);
+    pointer-events: none;
+  }
+  .hero-copy { position: relative; z-index: 1; min-width: 0; }
+  .eyebrow-gold {
+    display: inline-flex; align-items: center; gap: 7px; border-radius: 999px;
+    background: rgba(226, 169, 59, 0.12); border: 1px solid rgba(226, 169, 59, 0.48);
+    color: var(--gold); font-size: 9.5px; font-weight: 850; letter-spacing: 0.14em;
+    text-transform: none; padding: 6px 11px;
+  }
+  .hero-title {
+    font-size: clamp(1.95rem, 4.15vw, 3.35rem); line-height: 1.02; font-weight: 900;
+    letter-spacing: -0.015em; text-transform: uppercase; color: #fff;
+    margin: 16px 0 0; max-width: 16ch; text-wrap: balance;
+  }
+  .hero-question {
+    color: var(--gold); font-size: clamp(1.05rem, 1.6vw, 1.28rem); font-weight: 800;
+    line-height: 1.32; margin-top: 14px; max-width: 32ch;
+  }
+  .hero-lede { color: #CBD5E1; font-size: 14px; line-height: 1.65; max-width: 54ch; margin-top: 12px; }
+  .hero-callout {
+    margin-top: 20px; padding: 13px 15px; border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0; background: var(--navy-3);
+    border-top: 1px solid rgba(226, 169, 59, 0.16);
+    border-right: 1px solid rgba(148, 163, 184, 0.14);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  }
+  .hero-callout strong {
+    display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); font-weight: 850;
+  }
+  .hero-callout span { display: block; margin-top: 4px; font-size: 15px; font-weight: 750; color: #fff; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+  .hero-actions .btn {
+    min-height: 46px; padding: 12px 18px; font-size: 11.5px;
+    letter-spacing: 0.06em; text-transform: uppercase; font-weight: 850;
+  }
+  .hero-media { position: relative; z-index: 1; }
+  .hero-photo {
+    position: relative; margin: 0; overflow: hidden; aspect-ratio: 4 / 3;
+    border-radius: 18px; border: 1px solid rgba(226, 169, 59, 0.4);
+    background: var(--navy-3); box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.85);
+  }
+  .hero-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 58% 42%; }
+  .hero-photo::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, transparent 54%, rgba(7, 16, 28, 0.6) 100%);
+  }
+  .photo-tag {
+    position: absolute; z-index: 2; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(8, 18, 32, 0.74); border: 1px solid rgba(226, 169, 59, 0.38);
+    color: var(--gold); border-radius: 999px; padding: 5px 9px;
+    font-size: 9px; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase;
+    backdrop-filter: blur(7px);
+  }
+  .proof-pill {
+    position: absolute; z-index: 2; left: 11px; right: 11px; bottom: 11px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 7px;
+    padding: 7px 11px; border-radius: 999px; background: rgba(8, 18, 32, 0.84);
+    border: 1px solid rgba(226, 169, 59, 0.5); color: #F6ECD8;
+    font-size: 10px; font-weight: 650; line-height: 1.35;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.85);
+  }
+  .proof-pill > span { white-space: nowrap; }
+  .proof-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; background: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.18); }
+  .proof-arrow { color: var(--gold); opacity: 0.8; font-weight: 800; }
+  .proof-job { color: var(--gold); font-weight: 850; letter-spacing: 0.02em; }
+  /* ---------- KPI ---------- */
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .kpi {
+    position: relative; padding: 16px 16px 15px; border-radius: 16px; overflow: hidden;
+    background: linear-gradient(165deg, var(--navy-3) 0%, #111F31 100%);
+    border: 1px solid rgba(226, 169, 59, 0.3);
+    box-shadow: 0 16px 36px -28px rgba(0, 0, 0, 0.9);
+  }
+  .kpi::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), rgba(226, 169, 59, 0.22));
+  }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .kpi-label { font-size: 9.5px; font-weight: 850; letter-spacing: 0.12em; text-transform: uppercase; color: #CBD5E1; }
+  .kpi-icon {
+    flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+    background: rgba(226, 169, 59, 0.12); color: var(--gold); border: 1px solid rgba(226, 169, 59, 0.25);
+  }
+  .kpi-value {
+    font-size: clamp(1.65rem, 3vw, 2.15rem); font-weight: 900; letter-spacing: -0.04em;
+    line-height: 1.1; margin-top: 10px; color: #fff; font-variant-numeric: tabular-nums;
+  }
+  .kpi-foot { font-size: 10.5px; color: #94A3B8; margin-top: 5px; }
+  .kpi-foot b { color: var(--gold); font-weight: 750; }
+
+  /* ---------- badges + tags ---------- */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px;
+    font-size: 9.5px; font-weight: 850; letter-spacing: 0.05em; text-transform: uppercase;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .badge-emergency { background: var(--danger-bg); color: var(--danger); border-color: #FDA29B; }
+  .badge-standard { background: var(--info-bg); color: var(--info); border-color: #C7D7FE; }
+  .badge-unknown { background: #EEF2F6; color: #334155; border-color: #CBD5E1; }
+  .badge-booked { background: var(--ok-bg); color: #166534; border-color: #86EFAC; }
+  .badge-ready { background: var(--warn-bg); color: var(--warn); border-color: #FCD34D; }
+  .badge-called { background: #E0EAFF; color: #1E40AF; border-color: #C7D7FE; }
+  .badge-triaging, .badge-new { background: #EEF2F6; color: #334155; border-color: #CBD5E1; }
+  .badge-closed_lost { background: var(--danger-bg); color: var(--danger); border-color: #FDA29B; }
+  .tag {
+    display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 999px;
+    font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    background: #EEF2F6; color: #334155; border: 1px solid #CBD5E1;
+  }
+  .tag-sample { background: var(--navy); color: #CBD5E1; border-color: #334155; }
+  .tag-gold { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+  /* ---------- tables ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+  .data-table { width: 100%; border-collapse: collapse; min-width: 920px; }
+  .data-table th {
+    background: var(--off); color: var(--slate); font-size: 9px; font-weight: 850;
+    letter-spacing: 0.12em; text-transform: uppercase; text-align: left;
+    padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  .data-table td { padding: 11px 12px; border-bottom: 1px solid #EDF2F7; vertical-align: middle; color: var(--navy); font-size: 12px; }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+  .data-table tbody tr:hover { background: #FBFDFF; }
+  .call-row.is-emergency { box-shadow: inset 3px 0 0 var(--danger); }
+  .call-row.is-highlight { background: #FFF8E7 !important; box-shadow: inset 3px 0 0 var(--gold); }
+  .caller-cell { display: flex; flex-direction: column; gap: 1px; min-width: 140px; }
+  .caller-cell strong { font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--navy); }
+  .caller-cell span { font-size: 10.5px; color: var(--slate-2); }
+  .caller-cell .caller-when { font-size: 10px; color: var(--slate-2); font-variant-numeric: tabular-nums; }
+  .time-cell { display: flex; flex-direction: column; gap: 1px; min-width: 128px; }
+  .time-cell strong { font-size: 11.5px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .time-cell span { font-size: 10px; color: var(--slate-2); font-weight: 500; }
+  .duration-cell { font-size: 11.5px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .duration-cell span { display: block; font-size: 10px; color: var(--slate-2); font-weight: 500; }
+  .area-cell { font-size: 11.5px; font-weight: 700; color: var(--navy); min-width: 125px; }
+  .area-cell span { display: block; font-size: 10px; color: var(--slate-2); font-weight: 500; }
+  .summary-cell { min-width: 220px; max-width: 340px; color: #334155; font-size: 11.5px; line-height: 1.45; }
+  .summary-cell .tag { margin-top: 4px; }
+  .row-actions { display: flex; flex-wrap: nowrap; gap: 5px; min-width: 300px; }
+  .row-actions .btn { box-shadow: none; }
+  .table-empty { padding: 26px; text-align: center; color: var(--slate-2); font-size: 12.5px; }
+  .table-note {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--slate-2); padding: 9px 12px;
+    background: var(--off); border-top: 1px solid var(--line);
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    appearance: none; border: 1px solid var(--line-2); background: #fff; color: var(--slate);
+    font: inherit; font-size: 11px; font-weight: 750; padding: 7px 11px; border-radius: 999px;
+    cursor: pointer; white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--slate-2); color: var(--navy); }
+  .chip[aria-pressed="true"], .chip.is-active { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .input {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line-2); border-radius: 9px;
+    font: inherit; font-size: 12.5px; color: var(--navy); background: #fff;
+  }
+  .input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.25); }
+  .search { flex: 1 1 200px; max-width: 280px; }
+  .section { margin-top: 26px; }
+  .section-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .section-title { color: #fff; font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 850; letter-spacing: -0.02em; }
+  .section-sub { color: #94A3B8; font-size: 12px; margin-top: 3px; }
+  .view-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .view-title { color: #fff; font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 900; letter-spacing: -0.03em; text-transform: uppercase; }
+  .view-sub { color: #94A3B8; font-size: 12.5px; margin-top: 3px; }
+
+  /* ---------- pricing + ROI ---------- */
+  .pricing {
+    background: linear-gradient(180deg, #fff 0%, var(--off) 100%); color: var(--navy);
+    border-radius: 22px; padding: clamp(20px, 3.4vw, 34px);
+    border: 1px solid rgba(226, 169, 59, 0.4); box-shadow: var(--shadow);
+  }
+  .pricing-head { max-width: 66ch; }
+  .pricing-head h2 { font-size: clamp(1.45rem, 2.6vw, 2.05rem); font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; }
+  .pricing-head p { color: var(--slate); font-size: 13px; margin-top: 7px; }
+  .roi-panel {
+    margin-top: 20px; display: grid; gap: 16px; background: #fff;
+    border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+  }
+  .roi-controls { display: grid; gap: 16px; }
+  .roi-field label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 12px; font-weight: 750; color: var(--slate); }
+  .roi-field output { color: var(--navy); font-weight: 900; font-variant-numeric: tabular-nums; }
+  .roi-field input[type="range"] {
+    width: 100%; margin-top: 9px; height: 24px; cursor: pointer; accent-color: var(--gold);
+  }
+  .roi-results { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .roi-result { background: var(--navy); border: 1px solid rgba(226, 169, 59, 0.32); border-radius: 14px; padding: 14px; }
+  .roi-result span { font-size: 9px; letter-spacing: 0.11em; text-transform: uppercase; color: #94A3B8; font-weight: 850; }
+  .roi-result strong { display: block; margin-top: 5px; color: var(--gold); font-size: clamp(1.4rem, 3vw, 1.95rem); font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .roi-result small { display: block; color: #CBD5E1; font-size: 10px; margin-top: 2px; }
+  .roi-note { font-size: 10px; color: var(--slate-2); }
+  .tier-grid { display: grid; gap: 14px; margin-top: 20px; }
+  .tier {
+    position: relative; display: flex; flex-direction: column; background: #fff;
+    border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-soft);
+  }
+  .tier.is-featured { border: 2px solid var(--gold); box-shadow: 0 24px 50px -30px rgba(226, 169, 59, 0.7); }
+  .tier-badge {
+    position: absolute; top: -11px; left: 18px; background: var(--gold); color: var(--navy);
+    font-size: 9px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 999px;
+  }
+  .tier h3 { font-size: 12.5px; font-weight: 850; color: var(--navy); text-transform: uppercase; letter-spacing: 0.07em; }
+  .tier-price { display: flex; align-items: baseline; gap: 4px; margin-top: 7px; }
+  .tier-price strong { font-size: 32px; font-weight: 900; letter-spacing: -0.04em; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .tier-price span { font-size: 11px; color: var(--slate-2); font-weight: 600; }
+  .tier > p { font-size: 11.5px; color: var(--slate); margin-top: 4px; }
+  .tier ul { list-style: none; margin: 14px 0 18px; padding: 0; display: grid; gap: 8px; }
+  .tier li { display: flex; gap: 7px; font-size: 11.5px; color: #334155; line-height: 1.4; }
+  .tier li::before { content: "✓"; color: var(--gold-ink); font-weight: 900; flex: none; }
+  .tier .btn { margin-top: auto; }
+  /* ---------- AI agent setup ---------- */
+  .agent-layout { display: grid; gap: 16px; align-items: start; }
+  .agent-side {
+    background: linear-gradient(165deg, var(--navy-3), #101F33);
+    border: 1px solid rgba(226, 169, 59, 0.25); border-radius: 18px; padding: 14px;
+  }
+  .agent-side-title {
+    font-size: 9.5px; font-weight: 850; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gold); padding: 2px 4px 10px;
+  }
+  .step-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    background: transparent; border: 1px solid transparent; border-radius: 11px;
+    color: #CBD5E1; font: inherit; font-size: 11.5px; font-weight: 700;
+    padding: 9px 10px; cursor: pointer; margin-bottom: 4px;
+  }
+  .step-btn .n {
+    flex: none; width: 23px; height: 23px; border-radius: 8px; display: grid; place-items: center;
+    background: rgba(148, 163, 184, 0.12); color: #CBD5E1; font-size: 10.5px; font-weight: 850;
+  }
+  .step-btn:hover { background: rgba(27, 46, 70, 0.7); color: #fff; }
+  .step-btn.is-active { background: var(--navy-4); border-color: rgba(226, 169, 59, 0.5); color: var(--gold); }
+  .step-btn.is-active .n { background: var(--gold); color: var(--navy); }
+  .agent-panel[hidden] { display: none; }
+  .agent-panel h2 { font-size: 1.2rem; font-weight: 850; color: var(--navy); letter-spacing: -0.02em; }
+  .agent-panel .lede { font-size: 12.5px; color: var(--slate); margin: 5px 0 16px; }
+  .detail-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+  .detail { background: var(--off); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
+  .detail span { display: block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate-2); font-weight: 850; }
+  .detail strong { display: block; margin-top: 3px; font-size: 13px; color: var(--navy); font-weight: 800; overflow-wrap: anywhere; }
+  .number-card {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px; border-radius: 14px; background: var(--navy); color: #fff;
+    border: 1px solid rgba(226, 169, 59, 0.35);
+  }
+  .number-card .n { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 850; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .number-card small { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #94A3B8; font-weight: 850; margin-bottom: 2px; }
+  .choice-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .choice {
+    appearance: none; border: 1px solid var(--line-2); background: #fff; color: var(--slate);
+    font: inherit; font-size: 11px; font-weight: 750; padding: 8px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .choice:hover { border-color: var(--slate-2); color: var(--navy); }
+  .choice[aria-pressed="true"], .choice.is-active { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .switch-row:last-child { border-bottom: 0; }
+  .switch-row strong { display: block; font-size: 12.5px; color: var(--navy); }
+  .switch-row span.hint { display: block; font-size: 10.5px; color: var(--slate-2); margin-top: 1px; max-width: 52ch; }
+  .switch { position: relative; display: inline-flex; flex: none; width: 46px; height: 26px; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .switch .track { position: absolute; inset: 0; border-radius: 999px; background: #CBD5E1; transition: background 0.15s; }
+  .switch .track::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); transition: transform 0.15s;
+  }
+  .switch input:checked + .track { background: var(--gold); }
+  .switch input:checked + .track::after { transform: translateX(20px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .test-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    margin-top: 18px; padding: 14px 16px; background: var(--navy);
+    border: 1px solid rgba(226, 169, 59, 0.38); border-radius: 14px; color: #CBD5E1;
+  }
+  .wave { display: inline-flex; align-items: flex-end; gap: 2px; height: 18px; }
+  .wave i { display: block; width: 3px; border-radius: 2px; background: var(--gold); height: var(--h, 8px); opacity: 0.85; }
+  .agent-note { font-size: 10.5px; color: var(--slate-2); margin-top: 14px; line-height: 1.5; }
+  /* ---------- bookings calendar ---------- */
+  .bookings-layout { display: grid; gap: 16px; align-items: start; }
+  .tech-side {
+    background: linear-gradient(165deg, var(--navy-3), #101F33);
+    border: 1px solid rgba(226, 169, 59, 0.25); border-radius: 18px; padding: 16px; color: #E2E8F0;
+  }
+  .tech-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
+    border: 1px solid transparent; background: transparent; color: #CBD5E1; font: inherit;
+    font-size: 11.5px; font-weight: 700; padding: 9px 10px; border-radius: 10px; cursor: pointer; text-align: left;
+    margin-bottom: 3px;
+  }
+  .tech-btn:hover { background: rgba(27, 46, 70, 0.7); color: #fff; }
+  .tech-btn[aria-pressed="true"], .tech-btn.is-active { background: var(--navy-4); border-color: rgba(226, 169, 59, 0.5); color: var(--gold); }
+  .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .tech-meta { display: block; font-size: 9.5px; color: #94A3B8; font-weight: 500; margin-top: 1px; }
+  .calendar-card { overflow: hidden; }
+  .calendar-toolbar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 13px 16px; border-bottom: 1px solid var(--line); background: var(--off);
+  }
+  .calendar-toolbar strong { font-size: 13px; color: var(--navy); font-weight: 850; }
+  .calendar-toolbar span { display: block; font-size: 10.5px; color: var(--slate-2); }
+  .week-scroll { overflow-x: auto; }
+  .week-grid { display: grid; grid-template-columns: repeat(7, minmax(120px, 1fr)); min-width: 880px; }
+  .day-col { border-right: 1px solid var(--line); min-height: 330px; }
+  .day-col:last-child { border-right: 0; }
+  .day-head { padding: 9px 10px; background: #fff; border-bottom: 1px solid var(--line); text-align: center; }
+  .day-head strong { display: block; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); }
+  .day-head span { display: block; font-size: 15px; font-weight: 850; color: var(--navy); }
+  .day-head.is-today { background: #FFF8E7; }
+  .day-jobs { padding: 8px; display: grid; gap: 7px; align-content: start; }
+  .job {
+    appearance: none; border: 1px solid transparent; border-radius: 9px; padding: 8px;
+    text-align: left; font: inherit; cursor: pointer; width: 100%;
+  }
+  .job strong { display: block; font-size: 10px; line-height: 1.3; font-weight: 850; }
+  .job span { display: block; font-size: 9px; margin-top: 2px; opacity: 0.92; }
+  .job.is-booked { background: linear-gradient(160deg, #F1C86C, var(--gold)); border-color: #C99533; color: var(--navy); }
+  .job.is-pending { background: var(--navy-4); border-color: rgba(148, 163, 184, 0.2); color: #E8EEF6; }
+  .job.is-pending span { color: #CBD5E1; }
+  .job.is-demo { outline: 1px dashed rgba(71, 85, 105, 0.5); outline-offset: -3px; }
+  .job:hover { filter: brightness(1.05); }
+  .job:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .calendar-foot { padding: 10px 14px; border-top: 1px solid var(--line); font-size: 10.5px; color: var(--slate-2); background: var(--off); }
+  .sms-list { display: grid; gap: 0; }
+  .sms-item { display: grid; grid-template-columns: 66px 1fr auto; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .sms-item:last-child { border-bottom: 0; }
+  .sms-time { font-size: 10px; font-weight: 850; color: var(--slate-2); font-variant-numeric: tabular-nums; }
+  .sms-body strong { display: block; font-size: 11.5px; color: var(--navy); }
+  .sms-body span { display: block; font-size: 10.5px; color: var(--slate); margin-top: 2px; }
+  .demo-note { font-size: 10px; color: var(--slate-2); margin-top: 10px; }
+  /* ---------- forms + settings ---------- */
+  .settings-grid { display: grid; gap: 16px; align-items: start; }
+  .form-grid { display: grid; gap: 0 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .field { margin-bottom: 13px; }
+  .field label { display: block; font-size: 10.5px; font-weight: 750; color: var(--slate); margin-bottom: 5px; }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 10px 11px; border: 1px solid var(--line-2); border-radius: 9px;
+    font: inherit; font-size: 12.5px; color: var(--navy); background: #fff;
+  }
+  .field textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.25);
+  }
+  .field-hint { font-size: 10px; color: var(--slate-2); margin-top: 4px; }
+  .form-status { font-size: 11.5px; margin-top: 10px; min-height: 17px; color: var(--slate); }
+  .form-status.ok { color: var(--ok); font-weight: 650; }
+  .form-status.err { color: var(--danger); font-weight: 650; }
+  .banner {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    margin: 14px 0 0; padding: 12px 16px; border-radius: 13px;
+    background: var(--navy-3); border: 1px solid rgba(226, 169, 59, 0.4); color: #E8EEF6;
+    font-size: 12px;
+  }
+  .banner[hidden] { display: none; }
+  .banner-title { font-weight: 850; color: var(--gold); font-size: 12.5px; }
+  .notice {
+    display: flex; gap: 9px; padding: 10px 12px; border-radius: 10px;
+    background: var(--warn-bg); border: 1px solid #FCD34D; color: var(--warn); font-size: 11.5px;
+  }
+  .notice-info { background: var(--info-bg); border-color: #C7D7FE; color: #1E3A8A; }
+  .notice[hidden] { display: none; }
+  .notice code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; background: rgba(255, 255, 255, 0.6); border: 1px solid currentColor; border-radius: 4px; padding: 1px 5px; }
+  .meter { height: 9px; background: #E2E8F0; border-radius: 999px; overflow: hidden; margin: 12px 0 8px; }
+  .meter > span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 0.4s ease; }
+  .meter.is-high > span { background: linear-gradient(90deg, #D97706, #F59E0B); }
+  .meter.is-full > span { background: linear-gradient(90deg, #B42318, #EF4444); }
+  .billing-figure { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .billing-figure span { color: #94A3B8; font-size: 13px; font-weight: 600; letter-spacing: 0; }
+  .status-list { display: grid; gap: 9px; }
+  .status-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11.5px; color: var(--slate); }
+  .status-line b { color: var(--navy); font-weight: 750; }
+  .status-line .dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; display: inline-block; margin-right: 6px; }
+  .status-line .dot.off { background: #CBD5E1; }
+  .status-line .dot.warn { background: var(--gold); }
+
+  /* ---------- footer ---------- */
+  .foot { margin-top: 32px; padding-top: 18px; border-top: 1px solid rgba(148, 163, 184, 0.16); text-align: center; color: #94A3B8; font-size: 11px; line-height: 1.7; }
+  .foot strong { color: var(--gold); font-weight: 800; }
+  .foot .foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; margin-top: 8px; }
+  .foot .foot-links a { color: #CBD5E1; text-decoration: none; font-weight: 700; }
+  .foot .foot-links a:hover { color: var(--gold); }
+  /* ---------- onboarding wizard ---------- */
+  body.has-overlay { overflow: hidden; }
+  .overlay {
+    position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center;
+    padding: 16px; background: rgba(5, 13, 24, 0.8);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .overlay[hidden] { display: none; }
+  .wizard {
+    width: min(780px, 100%); max-height: min(92vh, 920px); overflow: auto; background: #fff;
+    color: var(--navy); border-radius: 20px; border: 1px solid rgba(226, 169, 59, 0.45);
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+  }
+  .wizard-head {
+    position: relative; padding: 24px;
+    background: linear-gradient(160deg, var(--navy-3) 0%, var(--navy) 100%);
+    border-bottom: 1px solid rgba(226, 169, 59, 0.28); color: #fff;
+  }
+  .wizard-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 9.5px; font-weight: 850;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+  }
+  .wizard-head h2 { font-size: 22px; line-height: 1.22; letter-spacing: -0.025em; margin: 8px 0; max-width: 34ch; color: #fff; }
+  .wizard-sub { font-size: 12.5px; color: #CBD5E1; max-width: 60ch; }
+  .wizard-media { position: relative; margin-top: 16px; }
+  .wizard-media .hero-photo { aspect-ratio: 2.6 / 1; border-radius: 12px; }
+  .wizard-media .proof-pill { left: 8px; right: 8px; bottom: 8px; padding: 6px 10px; font-size: 9.4px; }
+  .wizard-close {
+    position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 10px;
+    border: 1px solid rgba(226, 169, 59, 0.45); background: rgba(255, 255, 255, 0.08);
+    color: var(--gold); font-size: 18px; line-height: 1; cursor: pointer;
+  }
+  .wizard-close:hover { background: rgba(226, 169, 59, 0.16); color: var(--gold-2); }
+  .wizard-progress {
+    display: flex; flex-wrap: wrap; gap: 6px; padding: 13px 24px;
+    border-bottom: 1px solid var(--line); background: var(--off);
+  }
+  .wizard-body { padding: 20px 24px 24px; }
+  .wizard-step[hidden] { display: none; }
+  .wizard-step h3 { font-size: 15px; font-weight: 850; letter-spacing: -0.012em; margin-bottom: 4px; }
+  .wizard-step .step-lede { font-size: 12px; color: var(--slate); margin-bottom: 14px; }
+  .wizard .field input { min-height: 42px; }
+  .wizard-actions { display: grid; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: #fff; color: var(--slate);
+    font: inherit; font-size: 10.5px; font-weight: 750; cursor: pointer; white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--slate-2); }
+  .pill-num {
+    display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--navy); color: #fff; font-size: 9.5px; font-weight: 850;
+  }
+  .pill.is-done { background: var(--ok-bg); border-color: #86EFAC; color: #166534; cursor: default; }
+  .pill.is-done .pill-num { background: #16A34A; color: #fff; }
+  .pill.is-active { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.18); }
+  .forward-card {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 14px; border-radius: 12px; border: 1px solid rgba(226, 169, 59, 0.35);
+    background: var(--navy); color: #fff;
+  }
+  .forward-card .kpi-label { color: #94A3B8; }
+  .forward-number { font-size: 19px; font-weight: 850; letter-spacing: -0.01em; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .codes { display: grid; gap: 7px; margin: 14px 0 6px; padding: 0; list-style: none; }
+  .codes li { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--slate); }
+  .codes code, .inline-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 800;
+    background: var(--off); border: 1px solid var(--line-2); border-radius: 6px; padding: 2px 6px; color: var(--navy);
+  }
+  .plan-box {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px;
+    padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(226, 169, 59, 0.4);
+    background: #FFF8E7; margin-bottom: 12px;
+  }
+  .plan-box strong { font-size: 16px; letter-spacing: -0.02em; color: var(--navy); }
+  .plan-box span { font-size: 11px; color: var(--slate); }
+  .empty-state { padding: 24px 18px; text-align: center; color: var(--slate-2); }
+  .empty-state strong { display: block; color: var(--navy); font-size: 14px; margin-bottom: 3px; }
+  .setup-strip { overflow: hidden; }
+  .setup-strip .setup-strip-head { padding: 14px 20px 0; }
+  .setup-strip .card-title { color: #fff; }
+
+
+  @media (min-width: 720px) {
+    .page { padding: 26px 24px 72px; }
+    .roi-panel { grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr); align-items: center; }
+    .pill { font-size: 11px; padding: 7px 11px; }
+  }
+  @media (min-width: 760px) {
+    .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .tier-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tier.is-featured { transform: translateY(-6px); }
+  }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); }
+    .agent-layout { grid-template-columns: 250px minmax(0, 1fr); }
+    .agent-side { position: sticky; top: 92px; }
+  }
+  @media (min-width: 980px) {
+    .bookings-layout { grid-template-columns: 250px minmax(0, 1fr); }
+    .tech-side { position: sticky; top: 92px; }
+    .settings-grid { grid-template-columns: minmax(0, 1.32fr) minmax(0, 0.68fr); }
+  }
+  @media (max-width: 960px) {
+    .brand { order: 1; }
+    .topbar-actions { order: 2; }
+    .nav-scroll { order: 3; flex-basis: 100%; }
+    .statusbar-inner { padding: 8px 16px; }
+  }
+  @media (max-width: 740px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-title, .hero-question, .hero-lede { max-width: none; }
+    .hero-photo { aspect-ratio: 16 / 10; }
+    .live { margin-left: 0; flex-basis: 100%; }
+  }
+  @media (max-width: 640px) {
+    .appbar-inner { padding: 10px 14px; gap: 10px; }
+    .page { padding: 16px 14px 52px; }
+    .nav-pill { font-size: 11.5px; padding: 8px 11px; }
+    .nav-scroll { overflow: visible; }
+    .nav { flex-wrap: wrap; min-width: 0; }
+    .nav-pill { flex: 1 1 27%; text-align: center; }
+    .topbar-actions { width: 100%; margin-left: 0; }
+    .topbar-actions .btn { flex: 1 1 auto; }
+    .hero { padding: 20px 17px; border-radius: 20px; }
+    .hero-title { font-size: 1.85rem; }
+    .hero-actions .btn { flex: 1 1 100%; }
+    .proof-pill { font-size: 9.2px; border-radius: 14px; padding: 6px 9px; }
+    .proof-pill .proof-arrow { opacity: 0.95; }
+    .section { margin-top: 20px; }
+    .view-title { font-size: 1.35rem; }
+    .overlay { padding: 0; align-items: flex-end; }
+    .wizard { width: 100%; max-height: 94vh; border-radius: 20px 20px 0 0; }
+    .wizard-head { padding: 20px 18px 14px; }
+    .wizard-progress { padding: 12px 18px; }
+    .wizard-body { padding: 16px 18px 22px; }
+    .wizard-head h2 { font-size: 19px; }
+    .wizard-media .hero-photo { aspect-ratio: 16 / 9; }
+    .wizard-media .proof-pill { font-size: 8.8px; }
+    .sms-item { grid-template-columns: 56px 1fr; }
+    .sms-item > .badge { grid-column: 2; justify-self: start; }
+    .roi-results { grid-template-columns: 1fr 1fr; }
+    .roi-result strong { font-size: 1.4rem; }
+  }
+  @media (max-width: 430px) {
+    .brand-mark { width: 40px; height: 40px; }
+    .brand-title { font-size: 16px; }
+    .kpi-value { font-size: 1.65rem; }
+    .hero-title { font-size: 1.7rem; }
+    .roi-results { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+
+
+
+
+
+
+
+
+
+</style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6.6 3h3.2l1 3.4-2 1.7a12.6 12.6 0 0 0 4.8 4.8l1.7-2 3.4 1v3.2a2 2 0 0 1-2.2 2A16.3 16.3 0 0 1 4.6 5.2 2 2 0 0 1 6.6 3Z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">CallFlow<span>.biz</span> <span style="color:#94A3B8;font-weight:600">· Austin</span></h1>
+          <div class="brand-sub" id="businessSubtitle">Loading dispatch desk…</div>
+        </div>
+      </div>
+      <div class="nav-scroll">
+        <nav class="nav" role="tablist" aria-label="CallFlow app views">
+          <button class="nav-pill" id="tab-dashboard" role="tab" type="button" aria-selected="true" aria-controls="view-dashboard" data-view="dashboard">Dashboard</button>
+          <button class="nav-pill" id="tab-logs" role="tab" type="button" aria-selected="false" aria-controls="view-logs" data-view="logs">Call Logs</button>
+          <button class="nav-pill" id="tab-agent" role="tab" type="button" aria-selected="false" aria-controls="view-agent" data-view="agent">AI Agent</button>
+          <button class="nav-pill" id="tab-bookings" role="tab" type="button" aria-selected="false" aria-controls="view-bookings" data-view="bookings">Bookings</button>
+          <button class="nav-pill" id="tab-settings" role="tab" type="button" aria-selected="false" aria-controls="view-settings" data-view="settings">Settings</button>
+        </nav>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline-gold btn-sm" id="setupBtn" type="button">New Business Setup</button>
+        <button class="btn btn-outline-gold btn-sm" id="enablePushBtn" type="button">Enable Web Push</button>
+        <button class="btn btn-primary btn-sm" id="testSimBtn" type="button">Simulate Missed Call</button>
+        <div class="profile-menu" id="profileMenu">
+          <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileDrop">
+            <span class="profile-avatar" id="profileInitial">C</span>
+            <span class="profile-meta"><strong id="profileShop">Your shop</strong><small id="profileEmail">Signed in</small></span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="profile-drop" id="profileDrop" role="menu" hidden>
+            <div class="drop-head"><strong id="dropShop">Your shop</strong><span id="dropEmail">Signed in</span></div>
+            <button type="button" role="menuitem" data-goto-view="settings">Shop settings</button>
+            <button type="button" role="menuitem" data-goto-view="agent">AI agent setup</button>
+            <button type="button" role="menuitem" id="logoutBtn">Log out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="statusbar">
+    <div class="statusbar-inner">
+      <span class="status-pill" id="webhookStatus" title="Dograh webhook readiness"><i aria-hidden="true"></i><span>Webhooks</span></span>
+      <span class="status-pill" id="pushReadyStatus" title="Web push readiness"><i aria-hidden="true"></i><span>Push</span></span>
+      <span class="status-pill" id="planStatusBadge"><i aria-hidden="true"></i><span>Plan loading</span></span>
+      <span id="subStatusText">Billing: loading…</span>
+      <span class="live"><i aria-hidden="true"></i><span id="liveStatus">Syncing dispatch queue…</span></span>
+    </div>
+  </div>
+
+  <main class="page">
+    <div class="banner" id="billingBanner" hidden>
+      <div>
+        <div class="banner-title">Payment received — thank you.</div>
+        <div class="tiny" style="color:#CBD5E1">Refresh billing to confirm the $99/mo Solo plan is active on this account.</div>
+      </div>
+      <div class="row">
+        <button class="btn btn-sm btn-primary" id="refreshBillingBtn" type="button">Refresh billing status</button>
+        <button class="btn btn-sm btn-ghost" id="dismissBannerBtn" type="button">Dismiss</button>
+      </div>
+    </div>
+
+    <section class="view" id="view-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
+      <div class="view-head" style="margin-bottom:14px">
+        <div>
+          <span class="card-kicker" style="color:var(--gold)">Plumber workspace</span>
+          <h2 class="view-title" style="margin-top:4px">Dashboard</h2>
+          <p class="view-sub" id="dashboardSub">Live missed calls, booked jobs and AI dispatch for your Austin shop.</p>
+        </div>
+        <div class="row">
+          <span class="tag tag-gold" id="dashboardPlanTag">Plan</span>
+          <button class="btn btn-outline-gold btn-sm" id="dashboardRefreshBtn" type="button">Refresh workspace</button>
+        </div>
+      </div>
+      <div class="setup-strip card card-dark" id="setupStrip" hidden style="margin-top:14px">
+        <div class="setup-strip-head" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px">
+          <span style="font-size:12.5px;font-weight:800;color:#fff">Finish your setup</span>
+          <div class="row" style="gap:8px">
+            <span class="tag tag-gold" id="setupCount">0/4</span>
+            <button class="btn btn-sm btn-outline-gold" id="setupStripDismiss" type="button">Dismiss</button>
+          </div>
+        </div>
+        <div class="setup-pills" id="setupPills" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px 16px"></div>
+      </div>
+
+      <div class="kpi-grid" style="margin-top:16px">
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Missed Calls Captured</span>
+            <span class="kpi-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+          </div>
+          <div class="kpi-value" id="kpiTotalLeads">—</div>
+          <div class="kpi-foot" id="kpiCapturedFoot">Live calls captured</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Booked Jobs</span>
+            <span class="kpi-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          </div>
+          <div class="kpi-value" id="kpiBookedCount">—</div>
+          <div class="kpi-foot" id="kpiBookedFoot">Marked booked</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Est. Revenue Saved</span>
+            <span class="kpi-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          </div>
+          <div class="kpi-value" id="kpiBookedRev">—</div>
+          <div class="kpi-foot" id="kpiRevenueFoot">Booked ticket value</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Avg Response</span>
+            <span class="kpi-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          </div>
+          <div class="kpi-value" id="kpiAvgResponse">—</div>
+          <div class="kpi-foot" id="kpiResponseFoot">AI call handling time</div>
+        </div>
+      </div>
+
+      <section class="section" id="callFeedCard">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Live Call &amp; Lead Feed</h2>
+            <p class="section-sub">Newest missed calls across Austin · synced from <span class="mono">/api/state</span></p>
+          </div>
+          <div class="row">
+            <span class="tag" id="feedLiveTag">Live</span>
+            <button class="btn btn-sm btn-outline-gold" id="refreshQueueBtn" type="button">Refresh feed</button>
+          </div>
+        </div>
+        <div class="card" style="overflow:hidden">
+          <div class="table-wrap" style="border:0;border-radius:0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Caller</th>
+                  <th scope="col">Austin area</th>
+                  <th scope="col">What happened</th>
+                  <th scope="col">Urgency</th>
+                  <th scope="col">Booking</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leadsList">
+                <tr><td colspan="6" class="table-empty">Loading live calls…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-note">
+            <span class="tag tag-sample">SAMPLE</span>
+            <span id="demoNote">Rows tagged SAMPLE illustrate Austin coverage (Zilker, Round Rock, The Domain) until more live calls arrive. Real leads sync from your SQLite queue. Swipe the table horizontally to see every column.</span>
+          </div>
+        </div>
+      </section>
+    </section>
+    <section class="view" id="view-logs" role="tabpanel" aria-labelledby="tab-logs" hidden>
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">Call Logs</h2>
+          <p class="view-sub">Every AI-answered call, Austin neighborhood and booking status in one exportable log.</p>
+        </div>
+        <span class="tag tag-gold" id="logCount">Loading calls…</span>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3 class="card-title">All calls</h3>
+            <p class="card-desc">Newest first · live records plus clearly tagged sample rows</p>
+          </div>
+          <div class="row" style="gap:8px;flex:1 1 320px;justify-content:flex-end">
+            <input class="input search" id="logSearch" type="search" placeholder="Search caller, ZIP or issue…" aria-label="Search call logs" />
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chip-row" role="group" aria-label="Filter call logs" style="margin-bottom:12px">
+            <button class="chip" type="button" data-log-filter="all" aria-pressed="true">All calls</button>
+            <button class="chip" type="button" data-log-filter="emergency" aria-pressed="false">Emergency</button>
+            <button class="chip" type="button" data-log-filter="booked" aria-pressed="false">Booked</button>
+            <button class="chip" type="button" data-log-filter="open" aria-pressed="false">Open</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Caller</th>
+                  <th scope="col">Date &amp; time</th>
+                  <th scope="col">Call duration</th>
+                  <th scope="col">Austin area</th>
+                  <th scope="col">What happened</th>
+                  <th scope="col">Urgency</th>
+                  <th scope="col">Booking</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="callLogsBody">
+                <tr><td colspan="8" class="table-empty">Loading call logs…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="demo-note">Call logs are read from your SQLite queue. Sample rows are visual placeholders and cannot be edited; use “Simulate Missed Call” to create a real test lead.</p>
+        </div>
+      </div>
+    </section>
+    <section class="view" id="view-agent" role="tabpanel" aria-labelledby="tab-agent" hidden>
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">AI Voice Agent</h2>
+          <p class="view-sub">Five setup steps · Austin-local number, greeting, emergency routing and launch.</p>
+        </div>
+        <span class="tag tag-gold">Draft configuration</span>
+      </div>
+      <div class="agent-layout">
+        <aside class="agent-side" aria-label="AI agent setup steps">
+          <div class="agent-side-title">Setup steps</div>
+          <button class="step-btn is-active" type="button" data-agent-step="details" aria-selected="true"><span class="n">1</span><span>Business Details</span></button>
+          <button class="step-btn" type="button" data-agent-step="number" aria-selected="false"><span class="n">2</span><span>Number Assignment</span></button>
+          <button class="step-btn" type="button" data-agent-step="voice" aria-selected="false"><span class="n">3</span><span>Voice &amp; Greeting</span></button>
+          <button class="step-btn" type="button" data-agent-step="routing" aria-selected="false"><span class="n">4</span><span>Routing &amp; Rules</span></button>
+          <button class="step-btn" type="button" data-agent-step="launch" aria-selected="false"><span class="n">5</span><span>Integration &amp; Launch</span></button>
+          <p class="agent-note">Voice, greeting and rules are saved as a local draft in this MVP. Telephony sync activates when your Dograh/Telnyx credentials are connected.</p>
+        </aside>
+
+        <div class="card">
+          <div class="card-body">
+            <section class="agent-panel" data-agent-panel="details">
+              <h2>1 · Business Details</h2>
+              <p class="lede">What the AI agent says on the call and what appears on booking receipts.</p>
+              <div class="detail-grid">
+                <div class="detail"><span>Business</span><strong id="agentBusinessName">Loading…</strong></div>
+                <div class="detail"><span>Owner</span><strong id="agentOwnerName">Loading…</strong></div>
+                <div class="detail"><span>Billing email</span><strong id="agentEmail">Not set</strong></div>
+                <div class="detail"><span>Existing Austin line</span><strong id="agentExistingLine">Not set</strong></div>
+              </div>
+              <div class="row" style="margin-top:14px">
+                <button class="btn btn-dark" type="button" data-goto-view="settings">Edit business details</button>
+                <button class="btn" type="button" data-open-setup="shop">Open setup wizard</button>
+              </div>
+            </section>
+
+            <section class="agent-panel" data-agent-panel="number" hidden>
+              <h2>2 · Number Assignment</h2>
+              <p class="lede">Your customers keep dialling the shop line. CallFlow answers on a local Austin number only when you cannot pick up.</p>
+              <div class="number-card">
+                <div>
+                  <small>Assigned local number</small>
+                  <div class="n mono" id="agentNumber">+1 (512) 555-0194</div>
+                  <div class="tiny" style="color:#94A3B8">Austin metro · 512 / 737 overlay</div>
+                </div>
+                <button class="btn btn-sm btn-outline-gold" id="agentCopyNumberBtn" type="button">Copy number</button>
+              </div>
+              <div class="detail-grid" style="margin-top:12px">
+                <div class="detail"><span>Forward when unanswered</span><strong class="mono">*61* + number + #</strong></div>
+                <div class="detail"><span>Forward when busy</span><strong class="mono">*67* + number + #</strong></div>
+                <div class="detail"><span>Forward when unreachable</span><strong class="mono">*62* + number + #</strong></div>
+              </div>
+              <p class="agent-note">Number changes are saved through Settings → Telnyx forwarding target. No SMS short code or 10DLC campaign is required.</p>
+            </section>
+            <section class="agent-panel" data-agent-panel="voice" hidden>
+              <h2>3 · Voice &amp; Greeting</h2>
+              <p class="lede">Pick how your Austin agent sounds, then edit the first sentence every caller hears.</p>
+              <div class="field" style="margin-bottom:14px">
+                <label>Voice style</label>
+                <div class="choice-row" role="group" aria-label="Voice style">
+                  <button class="choice" type="button" data-voice="warm" aria-pressed="true">Warm &amp; direct</button>
+                  <button class="choice" type="button" data-voice="calm" aria-pressed="false">Calm &amp; reassuring</button>
+                  <button class="choice" type="button" data-voice="bilingual" aria-pressed="false">Bilingual EN / ES</button>
+                  <button class="choice" type="button" data-voice="crisp" aria-pressed="false">Fast &amp; crisp</button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="agentGreeting">Greeting script</label>
+                <textarea id="agentGreeting" spellcheck="true">Thanks for calling South Congress Plumbing. I’m the CallFlow assistant — are you dealing with a leak, a water heater, or a drain backup today?</textarea>
+                <div class="field-hint">Keep it under 30 seconds. The agent confirms the ZIP, urgency and best callback number before booking.</div>
+              </div>
+              <div class="test-bar" style="margin-top:6px">
+                <div>
+                  <div class="tiny" style="color:var(--gold);font-weight:850;letter-spacing:.1em;text-transform:uppercase">Greeting preview</div>
+                  <div style="font-size:12px;color:#E8EEF6;max-width:58ch" id="agentGreetingPreview">Thanks for calling South Congress Plumbing. I’m the CallFlow assistant — are you dealing with a leak, a water heater, or a drain backup today?</div>
+                </div>
+                <span class="wave" aria-hidden="true"><i style="--h:6px"></i><i style="--h:12px"></i><i style="--h:18px"></i><i style="--h:9px"></i><i style="--h:14px"></i><i style="--h:7px"></i><i style="--h:16px"></i><i style="--h:10px"></i></span>
+              </div>
+            </section>
+
+            <section class="agent-panel" data-agent-panel="routing" hidden>
+              <h2>4 · Routing &amp; Rules</h2>
+              <p class="lede">Decide when the AI answers, when it books, and when a human gets pinged immediately.</p>
+              <div>
+                <div class="switch-row">
+                  <div>
+                    <strong>Emergency dispatch routing</strong>
+                    <span class="hint">Burst pipes, slab leaks and no-hot-water calls page the on-call tech and create a priority lead.</span>
+                  </div>
+                  <label class="switch"><input id="emergencyRouting" type="checkbox" checked aria-label="Emergency dispatch routing" /><span class="track"></span></label>
+                </div>
+                <div class="switch-row">
+                  <div>
+                    <strong>After-hours answering</strong>
+                    <span class="hint">Answer 6pm–7am and all day Sunday across 78701–78759, Round Rock and Pflugerville.</span>
+                  </div>
+                  <label class="switch"><input id="afterHoursRouting" type="checkbox" checked aria-label="After-hours answering" /><span class="track"></span></label>
+                </div>
+              </div>
+              <div class="detail-grid" style="margin-top:14px">
+                <div class="detail"><span>On-call backup</span><strong id="agentBackupPhone">Loading…</strong></div>
+                <div class="detail"><span>Primary service area</span><strong id="agentServiceArea">Austin Metro</strong></div>
+                <div class="detail"><span>ZIPs covered</span><strong>78701–78759 · 78664 · 78660</strong></div>
+              </div>
+              <p class="agent-note">Routing edits are local drafts. Live call handling still follows the Dograh flow and Telnyx forwarding configured on the server.</p>
+            </section>
+            <section class="agent-panel" data-agent-panel="launch" hidden>
+              <h2>5 · Integration &amp; Launch</h2>
+              <p class="lede">Review the connections before you send the AI agent live on your Austin line.</p>
+              <div class="detail-grid">
+                <div class="detail"><span>Web push</span><strong id="agentPushState">Checking…</strong></div>
+                <div class="detail"><span>Calendar sync</span><strong>Not connected</strong></div>
+                <div class="detail"><span>SMS confirmations</span><strong>Not connected</strong></div>
+                <div class="detail"><span>Forwarding number</span><strong id="agentForwarding">Loading…</strong></div>
+              </div>
+              <div class="row" style="margin-top:16px">
+                <button class="btn btn-primary" id="agentSaveBtn" type="button">Save agent draft</button>
+                <button class="btn" type="button" data-open-setup="forwarding">Review forwarding</button>
+                <button class="btn btn-outline-gold" type="button" data-goto-view="settings">Open settings</button>
+              </div>
+              <div class="form-status" id="agentStatus" role="status" aria-live="polite"></div>
+            </section>
+
+            <div class="test-bar">
+              <div>
+                <div class="tiny" style="color:var(--gold);font-weight:850;letter-spacing:.1em;text-transform:uppercase">Test call preview</div>
+                <div style="font-size:12px;color:#E8EEF6"><span class="mono">(512) 555-0188</span> → AI agent → live queue</div>
+              </div>
+              <span class="wave" aria-hidden="true"><i style="--h:5px"></i><i style="--h:11px"></i><i style="--h:17px"></i><i style="--h:8px"></i><i style="--h:13px"></i><i style="--h:6px"></i><i style="--h:15px"></i><i style="--h:9px"></i></span>
+              <button class="btn btn-primary btn-sm" id="agentTestCallBtn" type="button">Run test call</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="view" id="view-bookings" role="tabpanel" aria-labelledby="tab-bookings" hidden>
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">Job Bookings &amp; Dispatch</h2>
+          <p class="view-sub">Weekly schedule for Austin crews · gold = booked, navy = pending dispatch.</p>
+        </div>
+        <div class="row">
+          <button class="btn btn-outline-gold" id="calendarSyncBtn" type="button">Sync calendar</button>
+          <button class="btn btn-sm btn-outline-gold" type="button" data-goto-view="logs">Open call logs</button>
+        </div>
+      </div>
+      <div class="bookings-layout">
+        <aside class="tech-side" aria-label="Technician filters">
+          <div class="agent-side-title">Technicians</div>
+          <button class="tech-btn" type="button" data-tech="all" aria-pressed="true">
+            <span><span class="tech-dot" style="background:var(--gold)"></span> All trucks <span class="tech-meta">South Congress · Zilker · Round Rock</span></span>
+          </button>
+          <button class="tech-btn" type="button" data-tech="ramiro" aria-pressed="false">
+            <span><span class="tech-dot" style="background:#F3C96B"></span> Ramiro G. <span class="tech-meta">Truck 1 · South Congress</span></span>
+          </button>
+          <button class="tech-btn" type="button" data-tech="luis" aria-pressed="false">
+            <span><span class="tech-dot" style="background:#60A5FA"></span> Luis M. <span class="tech-meta">Truck 2 · Round Rock</span></span>
+          </button>
+          <button class="tech-btn" type="button" data-tech="dana" aria-pressed="false">
+            <span><span class="tech-dot" style="background:#A78BFA"></span> Dana K. <span class="tech-meta">Truck 3 · The Domain</span></span>
+          </button>
+          <p class="agent-note">Job blocks come from booked leads in your SQLite queue. Dashed outlines mark sample schedule rows.</p>
+        </aside>
+
+        <div class="stack" style="min-width:0">
+          <div class="card calendar-card">
+            <div class="calendar-toolbar">
+              <div>
+                <strong id="calendarRange">This week · Austin, TX</strong>
+                <span id="calendarSyncStatus">Calendar sync not connected — sample schedule below.</span>
+              </div>
+              <button class="btn btn-sm" id="calendarTodayBtn" type="button">Today</button>
+            </div>
+            <div class="week-scroll">
+              <div class="week-grid" id="weekGrid"></div>
+            </div>
+            <div class="calendar-foot" id="bookingStatus" role="status" aria-live="polite">Select a job block to see the booking detail · swipe horizontally for the full week.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <span class="card-kicker">SMS booking log</span>
+                <h3 class="card-title" style="margin-top:4px">Confirmations &amp; follow-ups</h3>
+                <p class="card-desc">Sample log · SMS provider not connected in this build</p>
+              </div>
+              <span class="tag">Sample</span>
+            </div>
+            <div class="card-body">
+              <div class="sms-list" id="smsLogList"></div>
+              <p class="demo-note">Once Twilio is connected, the AI agent sends the booking confirmation, address link and reminder shown here. No message is sent from this demo.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="view" id="view-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+      <div class="view-head">
+        <div>
+          <h2 class="view-title">Settings</h2>
+          <p class="view-sub">Business profile, Austin routing, billing and alert delivery.</p>
+        </div>
+        <div class="row">
+          <button class="btn btn-outline-gold" id="settingsPushBtn" type="button">Enable Web Push</button>
+          <button class="btn btn-outline-gold" id="settingsSetupBtn" type="button">New Business Setup</button>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <span class="card-kicker">Routing profile</span>
+              <h3 class="card-title" style="margin-top:4px">Plumber &amp; Telnyx forwarding</h3>
+              <p class="card-desc">Saved to SQLite via <span class="mono">POST /api/plumber/settings</span></p>
+            </div>
+          </div>
+          <div class="card-body">
+            <form id="settingsForm" autocomplete="off">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="ownerName">Owner / client name</label>
+                  <input id="ownerName" name="owner_name" type="text" placeholder="Ramiro Garza" autocomplete="name" />
+                  <div class="field-hint">Customer name on Dodo checkout and receipts.</div>
+                </div>
+                <div class="field">
+                  <label for="businessName">Business name</label>
+                  <input id="businessName" name="business_name" type="text" required placeholder="South Congress Plumbing Co." />
+                </div>
+                <div class="field">
+                  <label for="plumberEmail">Billing email (Dodo receipts)</label>
+                  <input id="plumberEmail" name="email" type="email" placeholder="billing@yourbusiness.com" autocomplete="email" />
+                  <div class="field-hint">Prefills Dodo checkout and receives receipts.</div>
+                </div>
+                <div class="field">
+                  <label for="ownerPhone">Plumber mobile (tap-to-call backup)</label>
+                  <input id="ownerPhone" name="owner_phone" type="tel" placeholder="+1 512 555 0148" />
+                </div>
+                <div class="field">
+                  <label for="establishedLine">Your existing Austin number</label>
+                  <input id="establishedLine" name="established_line" type="tel" placeholder="+1 512 555 0148" />
+                  <div class="field-hint">The number customers already dial — it stays yours.</div>
+                </div>
+                <div class="field">
+                  <label for="telnyxNumber">Telnyx forwarding target</label>
+                  <input id="telnyxNumber" name="telnyx_number" type="tel" placeholder="+1 737 402 1244" />
+                  <div class="field-hint">Where conditional forwarding sends missed calls.</div>
+                </div>
+                <div class="field">
+                  <label for="avgTicket">Average job ticket (USD)</label>
+                  <input id="avgTicket" name="avg_ticket_usd" type="number" min="50" step="10" placeholder="520" />
+                </div>
+                <div class="field" style="grid-column: 1 / -1">
+                  <label for="serviceArea">Austin service area note</label>
+                  <input id="serviceArea" name="service_area_note" type="text" placeholder="Austin Metro (78701-78759)" />
+                </div>
+              </div>
+              <button class="btn btn-primary" type="submit">Save routing settings</button>
+              <div class="form-status" id="settingsStatus" role="status" aria-live="polite"></div>
+            </form>
+          </div>
+        </div>
+        <div class="stack">
+          <section class="card card-dark">
+            <div class="card-head">
+              <div>
+                <span class="card-kicker">Subscription</span>
+                <h3 class="card-title" style="margin-top:4px">Plan &amp; minutes</h3>
+                <p class="card-desc">Dodo Payments · secure checkout</p>
+              </div>
+              <span class="badge badge-unknown" id="planBadgeSettings">loading</span>
+            </div>
+            <div class="card-body">
+              <div class="spread" style="align-items:flex-start">
+                <div>
+                  <div class="kpi-label">Plan</div>
+                  <div id="planCode" style="font-size:15px;font-weight:800;color:#fff;margin-top:2px">—</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="kpi-label">Minutes used</div>
+                  <div id="planMinutes" class="mono" style="font-size:14px;color:var(--gold);margin-top:2px">— / —</div>
+                </div>
+              </div>
+              <div class="meter" id="planProgressWrap" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <span id="planProgress"></span>
+              </div>
+              <div class="row small" style="justify-content:space-between;color:#94A3B8">
+                <span id="planRemaining">—</span>
+                <span id="planPeriod">Renews —</span>
+              </div>
+              <div class="notice" id="billingNotice" hidden style="margin-top:14px">
+                <span aria-hidden="true">⚠</span>
+                <div id="billingNoticeText"></div>
+              </div>
+              <button class="btn btn-primary btn-block" id="startPlanBtn" type="button" style="margin-top:14px">Subscribe to Solo — $99/mo</button>
+              <div class="form-status" id="billingStatus" role="status" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <span class="card-kicker">System status</span>
+                <h3 class="card-title" style="margin-top:4px">Alerts &amp; integrations</h3>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="status-list">
+                <div class="status-line"><span><span class="dot" id="settingsPushDot"></span>Web push</span><b id="settingsPushText">Checking…</b></div>
+                <div class="status-line"><span><span class="dot" id="settingsWebhookDot"></span>Dograh webhook</span><b id="settingsWebhookText">Checking…</b></div>
+                <div class="status-line"><span><span class="dot off"></span>Calendar sync</span><b>Not connected</b></div>
+                <div class="status-line"><span><span class="dot off"></span>SMS provider</span><b>Not connected</b></div>
+              </div>
+              <div class="row" style="margin-top:14px">
+                <button class="btn btn-sm btn-dark" id="settingsRefreshBillingBtn" type="button">Refresh billing</button>
+                <button class="btn btn-sm" type="button" data-goto-view="agent">AI agent setup</button>
+              </div>
+              <p class="field-hint" style="margin-top:10px">Push requires VAPID keys in <span class="mono">.env</span>. Calendar and SMS need provider OAuth/API credentials.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+    <footer class="foot">
+      <strong>CallFlow.biz workspace</strong> · signed-in dispatch for Austin, TX plumbing crews · www.callflow.biz<br />
+      Calls are answered only after your own line goes unanswered.
+      <nav class="foot-links" aria-label="Legal and support">
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/refund-and-cancellation">Refund and Cancellation</a>
+        <a href="/contact">Contact Us</a>
+      </nav>
+    </footer>
+  </main>
+
+  <div class="overlay" id="onboardingOverlay" hidden>
+    <div class="wizard" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+      <div class="wizard-head">
+        <div class="wizard-eyebrow">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+          First-time setup · new business onboarding
+        </div>
+        <h2 id="wizardTitle">Turn Missed Emergency Calls Into Booked Austin Jobs.</h2>
+        <p class="wizard-sub">Keep your existing number, switch on instant push alerts and let the AI agent recover calls you cannot answer.</p>
+        <div class="wizard-media">
+          <figure class="hero-photo">
+            <img src="/assets/hero-plumber.jpg" alt="Plumber smiling at her phone after CallFlow turned a missed Austin call into a confirmed booking" width="1376" height="768" loading="lazy" decoding="async" />
+            <figcaption class="proof-pill">
+              <span><span class="proof-dot" aria-hidden="true"></span>Google Search Call</span>
+              <span class="proof-arrow" aria-hidden="true">→</span>
+              <span>CallFlow AI Answered</span>
+              <span class="proof-arrow" aria-hidden="true">→</span>
+              <span class="proof-job">CONFIRMED BOOKING · $480 Burst Pipe</span>
+            </figcaption>
+          </figure>
+        </div>
+        <button class="wizard-close" id="wizardClose" type="button" aria-label="Close setup">×</button>
+      </div>
+      <div class="wizard-progress" id="wizardProgress"></div>
+      <div class="wizard-body">
+        <section class="wizard-step" data-step="shop" id="wizardStepShop">
+          <h3>1 · Your business profile</h3>
+          <p class="step-lede">This is what your crew sees on alerts and what Dodo uses on receipts.</p>
+          <form id="wizardForm" autocomplete="on">
+            <div class="form-grid">
+              <div class="field">
+                <label for="wOwnerName">Owner / client name</label>
+                <input id="wOwnerName" type="text" placeholder="Ramiro Garza" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="wBusinessName">Business name</label>
+                <input id="wBusinessName" type="text" placeholder="South Congress Plumbing Co." autocomplete="organization" />
+              </div>
+              <div class="field">
+                <label for="wEmail">Billing email</label>
+                <input id="wEmail" type="email" placeholder="billing@yourshop.com" autocomplete="email" />
+                <div class="field-hint">Used for Dodo receipts and checkout prefill.</div>
+              </div>
+              <div class="field">
+                <label for="wPhone">Mobile phone</label>
+                <input id="wPhone" type="tel" placeholder="+1 512 555 0148" autocomplete="tel" />
+              </div>
+            </div>
+            <div class="wizard-actions">
+              <button class="btn btn-primary btn-block" type="submit">Save business details</button>
+              <button class="btn btn-block" type="button" data-wizard-next="forwarding">Continue</button>
+            </div>
+            <div class="form-status" id="wizardStatus" role="status" aria-live="polite"></div>
+          </form>
+        </section>
+        <section class="wizard-step" data-step="forwarding" id="wizardStepForwarding" hidden>
+          <h3>2 · Call forwarding &amp; alerts</h3>
+          <p class="step-lede">Keep your existing number — forward only when you cannot pick up. No SMS, no 10DLC.</p>
+          <div class="forward-card">
+            <div><span class="kpi-label">Your CallFlow number</span><div class="forward-number mono" id="wizardNumber">—</div></div>
+            <button class="btn btn-sm btn-outline-gold" id="copyNumberBtn" type="button">Copy number</button>
+          </div>
+          <ul class="codes">
+            <li><code>*61*</code> Forward when unanswered</li>
+            <li><code>*62*</code> Forward when unreachable</li>
+            <li><code>*67*</code> Forward when busy</li>
+          </ul>
+          <p class="tiny" style="color:var(--slate);margin:0 0 14px">Dial <span class="inline-code">*61*</span> + your CallFlow number + <span class="inline-code">#</span> from the shop line — e.g. <span class="inline-code">*61*+15125550199#</span>.</p>
+          <div class="wizard-actions">
+            <button class="btn btn-primary btn-block" id="wizardPushBtn" type="button">Enable Instant Push Alerts</button>
+            <button class="btn btn-block" type="button" data-wizard-next="plan">Continue to plan</button>
+          </div>
+          <div class="form-status" id="wizardPushStatus" role="status" aria-live="polite"></div>
+        </section>
+        <section class="wizard-step" data-step="plan" id="wizardStepPlan" hidden>
+          <h3>3 · Activate your plan</h3>
+          <p class="step-lede">Your 3-day trial captures up to 5 leads per day. Solo removes that daily cap and unlocks unlimited leads, a dedicated local number and custom AI routing.</p>
+          <div class="plan-box"><strong>Trial · $0</strong><span>Valid for 3 days · max 5 leads per day · 30 AI minutes</span></div>
+          <div class="plan-box" style="margin-top:10px"><strong>Solo · $99/mo</strong><span>Unlimited daily leads · dedicated local number · 300 included minutes · cancel anytime</span></div>
+          <div class="wizard-actions">
+            <button class="btn btn-primary btn-block" id="wizardPlanBtn" type="button">Subscribe to Solo — $99/mo</button>
+            <button class="btn btn-block" id="exploreBtn" type="button">Explore Live Dispatch Demo</button>
+          </div>
+          <div class="form-status" id="wizardPlanStatus" role="status" aria-live="polite"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const WITHHELD_RE = /restricted|anonymous|unknown|private|blocked|unavailable|withheld|no caller/i;
+    const STATUSES = ['new', 'triaging', 'ready', 'called', 'booked', 'closed_lost'];
+    const ZIP_SAMPLES = ['78701', '78704', '78745', '78748', '78749', '78758', '78759'];
+    const VIEW_KEYS = ['dashboard', 'logs', 'agent', 'bookings', 'settings'];
+    const state = { plumber: null, leads: [], pushEnabled: false, vapidPublicKey: null, logFilter: 'all', logQuery: '', tech: 'all', weekStart: null, accountEmail: '' };
+
+    const AUSTIN_AREAS = {
+      '78701': 'Downtown Austin', '78702': 'East Austin', '78703': 'Clarksville', '78704': 'South Congress · Zilker',
+      '78731': 'Cat Mountain', '78745': 'South Austin', '78748': 'Shady Hollow', '78749': 'Oak Hill',
+      '78758': 'The Domain', '78759': 'Northwest Hills', '78664': 'Round Rock', '78660': 'Pflugerville',
+    };
+    const areaForZip = (zip) => AUSTIN_AREAS[String(zip || '').trim()] || 'Austin Metro';
+    const areaLabel = (zip) => zip ? `${areaForZip(zip)} · ${zip}` : 'Austin Metro';
+
+    const DEMO_LEADS = [
+      { id: 'sample-zilker', demo: true, caller_name: 'Marcus Reed', caller_phone: '+15125550141', urgency: 'emergency', status: 'ready', zip_code: '78704', issue_summary: 'Slab leak under kitchen sink — water pooling near the cabinetry', estimated_value_usd: 640, duration_seconds: 52, created_at: new Date(Date.now() - 6 * 60000).toISOString() },
+      { id: 'sample-roundrock', demo: true, caller_name: 'Priya Shah', caller_phone: '+15125550162', urgency: 'emergency', status: 'booked', zip_code: '78664', issue_summary: 'Water heater failed overnight — no hot water and garage floor is wet', estimated_value_usd: 980, duration_seconds: 61, created_at: new Date(Date.now() - 22 * 60000).toISOString() },
+      { id: 'sample-domain', demo: true, caller_name: 'Devon Brooks', caller_phone: '+15125550188', urgency: 'emergency', status: 'called', zip_code: '78758', issue_summary: 'Toilet supply line burst near The Domain, shutoff valve stuck', estimated_value_usd: 480, duration_seconds: 44, created_at: new Date(Date.now() - 41 * 60000).toISOString() },
+      { id: 'sample-east', demo: true, caller_name: 'Elena Ortiz', caller_phone: '+15125550137', urgency: 'standard', status: 'booked', zip_code: '78702', issue_summary: 'Kitchen drain backing up into the dishwasher', estimated_value_usd: 320, duration_seconds: 38, created_at: new Date(Date.now() - 64 * 60000).toISOString() },
+      { id: 'sample-south', demo: true, caller_name: 'Tasha Nguyen', caller_phone: '+15125550119', urgency: 'standard', status: 'new', zip_code: '78745', issue_summary: 'Outdoor hose bib leaking after the freeze warning', estimated_value_usd: 240, duration_seconds: 33, created_at: new Date(Date.now() - 96 * 60000).toISOString() },
+    ];
+
+    function displayLeads(leads, limit) {
+      const real = Array.isArray(leads) ? leads : [];
+      const usedNames = new Set(real.map((lead) => String(lead.caller_name || '').toLowerCase()));
+      const samples = DEMO_LEADS.filter((lead) => !usedNames.has(String(lead.caller_name).toLowerCase()));
+      const combined = real.concat(samples);
+      return typeof limit === 'number' ? combined.slice(0, limit) : combined;
+    }
+
+    function isDialable(raw) {
+      const value = String(raw || '').trim();
+      if (!value || value.includes('@')) return false;
+      if (WITHHELD_RE.test(value)) return false;
+      return (value.match(/\d/g) || []).length >= 8;
+    }
+    function formatPhone(raw) {
+      const value = String(raw || '').trim();
+      if (!isDialable(value)) return value;
+      if (/^\+1\d{10}$/.test(value)) {
+        const digits = value.slice(2);
+        return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      }
+      return value;
+    }
+    function callerDisplay(raw) {
+      const value = String(raw || '').trim();
+      if (!value) return { text: 'Unknown caller', detail: null };
+      if (isDialable(value)) return { text: formatPhone(value), detail: null };
+      if (/restricted|anonymous|private|blocked|withheld|unknown|unavailable/i.test(value)) return { text: 'Withheld number', detail: value };
+      return { text: value, detail: null };
+    }
+    const money = (value) => '$' + Math.round(Number(value) || 0).toLocaleString('en-US');
+    function formatDuration(seconds) {
+      const total = Math.max(0, Math.round(Number(seconds) || 0));
+      const mins = Math.floor(total / 60);
+      const secs = total % 60;
+      return mins ? `${mins}m ${String(secs).padStart(2, '0')}s` : `${secs}s`;
+    }
+    // Call time: prefer the provider's call-start timestamp, else capture time.
+    function callTimeValue(lead) {
+      const raw = lead && (lead.call_started_at || lead.created_at);
+      return raw && Number.isFinite(Date.parse(raw)) ? raw : null;
+    }
+    function formatCallTime(iso) {
+      const ms = Date.parse(iso);
+      if (!Number.isFinite(ms)) return 'Time unknown';
+      return new Date(ms).toLocaleString(undefined, {
+        month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+    }
+    function formatUtcTime(iso) {
+      const ms = Date.parse(iso);
+      if (!Number.isFinite(ms)) return 'UTC —';
+      const d = new Date(ms);
+      return `UTC ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
+    }
+    function timeAgo(iso) {
+      const stamp = Date.parse(iso);
+      if (!stamp) return 'time unknown';
+      const diff = Math.max(0, Date.now() - stamp) / 1000;
+      if (diff < 45) return 'just now';
+      if (diff < 3600) return `${Math.max(1, Math.round(diff / 60))}m ago`;
+      if (diff < 86400) return `${Math.round(diff / 3600)}h ago`;
+      return `${Math.round(diff / 86400)}d ago`;
+    }
+    const badgeClass = (kind, value) => {
+      const safe = String(value || '').toLowerCase();
+      if (kind === 'urgency') return `badge-${['emergency', 'standard', 'unknown'].includes(safe) ? safe : 'unknown'}`;
+      const normalized = safe.replace(/\s+/g, '_');
+      return `badge-${STATUSES.includes(normalized) ? normalized : 'unknown'}`;
+    };
+    const planBadgeClass = (status) => {
+      const s = String(status || '').toLowerCase();
+      if (s === 'active') return 'badge-booked';
+      if (s === 'trialing') return 'badge-standard';
+      if (s === 'past_due' || s === 'on_hold') return 'badge-ready';
+      if (s === 'cancelled' || s === 'expired') return 'badge-emergency';
+      return 'badge-unknown';
+    };
+    const WITHHELD_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20" /><path d="M6.6 3h3.2l1 3.4-2 1.7a12.6 12.6 0 0 0 4.8 4.8l1.7-2 3.4 1v3.2a2 2 0 0 1-2.2 2A16.3 16.3 0 0 1 4.6 5.2 2 2 0 0 1 6.6 3Z" /></svg>';
+
+    function setLive(text) { const el = $('liveStatus'); if (el) el.textContent = text; }
+    function setStatusOn(id, text, kind) {
+      const el = $(id); if (!el) return;
+      el.textContent = text || '';
+      el.className = 'form-status' + (kind ? ' ' + kind : '');
+    }
+    function setBillingStatus(text, kind) { setStatusOn('billingStatus', text, kind); }
+    function toast(text, kind) {
+      setLive(text);
+      const el = $('settingsStatus');
+      if (el && kind) setStatusOn('settingsStatus', text, kind);
+    }
+
+    function selectView(view) {
+      const key = view === 'overview' ? 'dashboard' : view;
+      const target = VIEW_KEYS.includes(key) ? key : 'dashboard';
+      VIEW_KEYS.forEach((name) => {
+        const panel = $('view-' + name); if (panel) panel.hidden = name !== target;
+        const tab = $('tab-' + name);
+        if (tab) {
+          tab.setAttribute('aria-selected', String(name === target));
+          tab.classList.toggle('is-active', name === target);
+        }
+      });
+      try {
+        const url = new URL(window.location.href);
+        url.hash = target;
+        window.history.replaceState(null, '', url);
+      } catch { /* ignore */ }
+      if (target === 'logs') renderCallLogs();
+      if (target === 'bookings') renderBookings(state.leads, state.plumber);
+      if (target === 'agent') paintAgent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function buildZipGrid() {
+      const grid = $('zipGrid'); if (!grid) return;
+      grid.innerHTML = ZIP_SAMPLES.map((zip) => `<span class="tag">${esc(zip)}</span>`).join('') + '<span class="tag">78701–78759</span>';
+    }
+    /* ---------------- call rows ---------------- */
+    const URGENCY_LABELS = { emergency: 'Emergency', standard: 'Standard', unknown: 'Unclassified' };
+    const urgencyLabel = (value) => URGENCY_LABELS[String(value || '').toLowerCase()] || 'Unclassified';
+
+    function jobCategory(issue) {
+      const text = String(issue || '').toLowerCase();
+      if (/water heater|heater/.test(text)) return 'Water Heater';
+      if (/burst|leak|pipe|spray|flood/.test(text)) return 'Leak / Burst';
+      if (/sewer|drain|clog|toilet|backup/.test(text)) return 'Drain / Sewer';
+      if (/\bgas\b/.test(text)) return 'Gas Line';
+      return null;
+    }
+
+    function leadRowMarkup(lead, plumber, withTiming) {
+      const demo = Boolean(lead.demo);
+      const when = callTimeValue(lead);
+      const durationLabel = formatDuration(lead.duration_seconds);
+      // The dedicated Call Logs table gets explicit Date & time + Duration
+      // columns; the dashboard feed shows the same facts inline under the caller.
+      const timingCells = withTiming
+        ? `<td><div class="time-cell"><strong>${esc(formatCallTime(when))}</strong><span>${esc(formatUtcTime(when))} · ${esc(timeAgo(when))}</span></div></td>
+          <td><div class="duration-cell">${esc(durationLabel)}<span>${lead.duration_seconds ? esc(Math.round(Number(lead.duration_seconds)) + 's talk time') : 'no talk time recorded'}</span></div></td>`
+        : '';
+      const dialable = isDialable(lead.caller_phone);
+      const caller = callerDisplay(lead.caller_phone);
+      const urgency = String(lead.urgency || 'unknown').toLowerCase();
+      const status = String(lead.status || 'new').replace(/\s+/g, '_');
+      const amount = money(lead.estimated_value_usd || (plumber && plumber.avg_ticket_usd) || 480);
+      const category = jobCategory(lead.issue_summary);
+      const actions = demo
+        ? '<span class="tag tag-sample">Sample row</span>'
+        : `${dialable
+            ? `<a class="btn btn-sm" href="tel:${esc(lead.caller_phone)}">Call</a>`
+            : '<span class="btn btn-sm" aria-disabled="true" title="No dialable number captured">No number</span>'}
+          <button class="btn btn-sm btn-primary" type="button" data-action="booked" data-id="${esc(lead.id)}">Book ${esc(amount)}</button>
+          <button class="btn btn-sm" type="button" data-action="called" data-id="${esc(lead.id)}">Called</button>
+          <button class="btn btn-sm btn-ghost" type="button" data-action="closed_lost" data-id="${esc(lead.id)}">Archive</button>`;
+      return `
+        <tr class="call-row${urgency === 'emergency' ? ' is-emergency' : ''}" data-lead-id="${esc(lead.id)}"${demo ? ' data-demo="1"' : ''}>
+          <td>
+            <div class="caller-cell">
+              <strong>${dialable ? esc(caller.text) : WITHHELD_ICON + ' Withheld'}</strong>
+              <span>${esc(lead.caller_name || caller.detail || 'Austin caller')}</span>
+              <span class="caller-when">${esc(durationLabel)} · ${esc(formatCallTime(when))}</span>
+            </div>
+          </td>
+          ${timingCells}
+          <td><div class="area-cell">${esc(areaForZip(lead.zip_code))}<span>${esc(lead.zip_code ? 'ZIP ' + lead.zip_code : 'Austin metro')}</span></div></td>
+          <td>
+            <div class="summary-cell">
+              ${esc(lead.issue_summary || 'No details captured — call back to qualify the job.')}
+              <div class="row" style="gap:4px">
+                ${category ? `<span class="tag">${esc(category)}</span>` : ''}
+                ${demo ? '<span class="tag tag-sample">Sample</span>' : ''}
+              </div>
+            </div>
+          </td>
+          <td><span class="badge ${badgeClass('urgency', urgency)}">${esc(urgencyLabel(urgency))}</span></td>
+          <td><span class="badge ${badgeClass('status', status)}">${esc(status.replace(/_/g, ' '))}</span></td>
+          <td><div class="row-actions">${actions}</div></td>
+        </tr>`;
+    }
+
+    function renderCallRows(body, leads, plumber, options) {
+      if (!body) return;
+      const opts = options || {};
+      const withTiming = Boolean(opts.withTiming);
+      const colspan = withTiming ? 8 : 6;
+      const rows = (typeof opts.limit === 'number' ? leads.slice(0, opts.limit) : leads)
+        .map((lead) => leadRowMarkup(lead, plumber, withTiming)).join('');
+      body.innerHTML = rows || `<tr><td colspan="${colspan}" class="table-empty">No calls match this view yet. Simulate a missed call to create a live lead.</td></tr>`;
+    }
+
+    function renderLeads(leads, plumber) {
+      renderCallRows($('leadsList'), displayLeads(leads, 12), plumber);
+    }
+    function renderCallLogs() {
+      const all = displayLeads(state.leads);
+      const query = state.logQuery.trim().toLowerCase();
+      const filtered = all.filter((lead) => {
+        const status = String(lead.status || '').toLowerCase();
+        if (state.logFilter === 'emergency' && String(lead.urgency).toLowerCase() !== 'emergency') return false;
+        if (state.logFilter === 'booked' && status !== 'booked') return false;
+        if (state.logFilter === 'open' && ['booked', 'closed_lost'].includes(status)) return false;
+        if (!query) return true;
+        return [lead.caller_name, lead.caller_phone, lead.issue_summary, lead.zip_code, areaForZip(lead.zip_code)]
+          .some((value) => String(value || '').toLowerCase().includes(query));
+      });
+      renderCallRows($('callLogsBody'), filtered, state.plumber, { withTiming: true });
+      const count = $('logCount');
+      if (count) count.textContent = `${filtered.length} calls · ${state.leads.length} live`;
+    }
+
+    async function updateLead(id, patch) {
+      try {
+        const res = await fetch(`/api/leads/${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        });
+        if (!res.ok) throw new Error('update failed');
+        await loadState();
+        setLive(`Lead updated → ${patch.status} · queue synced`);
+      } catch {
+        setLive('Could not update that lead — check your connection');
+      }
+    }
+
+    function syncFormFields(plumber) {
+      const pairs = [
+        ['ownerName', plumber.owner_name || ''],
+        ['businessName', plumber.business_name || ''],
+        ['plumberEmail', plumber.email || ''],
+        ['establishedLine', plumber.established_line ? formatPhone(plumber.established_line) : ''],
+        ['telnyxNumber', plumber.telnyx_number ? formatPhone(plumber.telnyx_number) : ''],
+        ['ownerPhone', plumber.owner_phone ? formatPhone(plumber.owner_phone) : ''],
+        ['avgTicket', plumber.avg_ticket_usd || ''],
+        ['serviceArea', plumber.service_area_note || ''],
+      ];
+      pairs.forEach(([id, value]) => {
+        const el = $(id);
+        if (el && document.activeElement !== el) el.value = value;
+      });
+    }
+
+    function highlightDeepLinkedLead() {
+      const leadId = new URLSearchParams(window.location.search).get('lead');
+      if (!leadId) return;
+      const target = Array.from(document.querySelectorAll('[data-lead-id]')).find((el) => el.dataset.leadId === leadId && !el.dataset.demo);
+      if (!target) return;
+      target.classList.add('is-highlight');
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    async function loadState() {
+      const res = await fetch('/api/state', { cache: 'no-store' });
+      if (res.status === 401) { window.location.assign('/?login=1'); throw new Error('auth_required'); }
+      if (!res.ok) throw new Error('state unavailable');
+      const data = await res.json();
+      const plumber = data.plumber || {};
+      const leads = data.leads || [];
+      const metrics = data.metrics || {};
+
+      state.plumber = plumber;
+      state.leads = leads;
+
+      const shopName = plumber.business_name || 'Your shop';
+      const accountEmail = state.accountEmail || plumber.email || 'Signed in';
+      $('businessSubtitle').textContent = plumber.business_name
+        ? `${plumber.business_name} · Austin, TX${plumber.telnyx_number ? ' · routing ' + formatPhone(plumber.telnyx_number) : ' · no forwarding number yet'}`
+        : 'www.callflow.biz · Austin, TX';
+      const dashSub = $('dashboardSub');
+      if (dashSub) dashSub.textContent = `${shopName} · live missed calls, booked jobs and AI dispatch · Austin, TX`;
+      if ($('profileShop')) $('profileShop').textContent = shopName;
+      if ($('profileEmail')) $('profileEmail').textContent = accountEmail;
+      if ($('profileInitial')) $('profileInitial').textContent = (shopName.trim()[0] || 'C').toUpperCase();
+      if ($('dropShop')) $('dropShop').textContent = shopName;
+      if ($('dropEmail')) $('dropEmail').textContent = accountEmail;
+
+      const openLeads = leads.filter((lead) => lead.status !== 'booked' && lead.status !== 'closed_lost').length;
+      const captured = Number(metrics.totalLeads) || leads.length;
+      $('kpiTotalLeads').textContent = String(captured);
+      $('kpiCapturedFoot').innerHTML = `<b>${openLeads}</b> open · ${captured - openLeads} worked`;
+      $('kpiBookedCount').textContent = String(metrics.bookedCount || 0);
+      $('kpiBookedFoot').textContent = `of ${captured} captured calls`;
+      $('kpiBookedRev').textContent = money(metrics.bookedRevenueUsd || 0);
+      $('kpiRevenueFoot').textContent = `Avg ticket ${money(plumber.avg_ticket_usd || 480)}`;
+
+      const durations = leads.map((lead) => Number(lead.duration_seconds) || 0).filter(Boolean);
+      const avg = durations.length ? Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length) : 54;
+      $('kpiAvgResponse').textContent = avg >= 60 ? `${Math.floor(avg / 60)}m ${String(avg % 60).padStart(2, '0')}s` : `${avg}s`;
+      $('kpiResponseFoot').textContent = 'AI answers in under two rings';
+
+      const plan = plumber.plan_code || 'solo_99';
+      const planLabel = plan === 'solo_99' ? 'Solo · $99/mo' : plan;
+      const planTag = $('dashboardPlanTag');
+      if (planTag) planTag.textContent = `${planLabel} · ${plumber.subscription_status || 'trial'}`;
+      $('subStatusText').textContent = `Billing: ${plan} · ${plumber.subscription_status || 'unknown'} · ${plumber.used_minutes || 0}/${plumber.included_minutes || 0} min`;
+
+      syncFormFields(plumber);
+      renderLeads(leads, plumber);
+      renderCallLogs();
+
+      const forwardingNumber = plumber.telnyx_number ? formatPhone(plumber.telnyx_number) : '+1 (512) 555-0194';
+      const heroNumber = $('overviewNumber');
+      if (heroNumber) heroNumber.textContent = forwardingNumber;
+      document.querySelectorAll('[data-overview-number]').forEach((el) => { el.textContent = forwardingNumber; });
+      const area = $('overviewServiceArea');
+      if (area) area.textContent = plumber.service_area_note || 'Austin Metro (78701–78759)';
+
+      const agentNumber = $('agentNumber');
+      if (agentNumber) agentNumber.textContent = forwardingNumber;
+      const agentForwarding = $('agentForwarding');
+      if (agentForwarding) agentForwarding.textContent = forwardingNumber;
+      const agentBusiness = $('agentBusinessName');
+      if (agentBusiness) agentBusiness.textContent = plumber.business_name || 'Your shop';
+      const agentOwner = $('agentOwnerName');
+      if (agentOwner) agentOwner.textContent = plumber.owner_name || 'Not set';
+      const agentEmail = $('agentEmail');
+      if (agentEmail) agentEmail.textContent = plumber.email || 'Not set';
+      const agentExisting = $('agentExistingLine');
+      if (agentExisting) agentExisting.textContent = plumber.established_line ? formatPhone(plumber.established_line) : 'Not set';
+      const agentBackup = $('agentBackupPhone');
+      if (agentBackup) agentBackup.textContent = plumber.owner_phone ? formatPhone(plumber.owner_phone) : 'Not set';
+      const agentArea = $('agentServiceArea');
+      if (agentArea) agentArea.textContent = plumber.service_area_note || 'Austin Metro (78701–78759)';
+
+      paintAgent();
+      renderBookings(leads, plumber);
+      setLive(`Live · ${leads.length} leads · updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+      highlightDeepLinkedLead();
+    }
+    /* ---------------- bookings + SMS + ROI ---------------- */
+    const TECHS = [
+      { id: 'ramiro', name: 'Ramiro G.', truck: 'Truck 1', color: '#F3C96B' },
+      { id: 'luis', name: 'Luis M.', truck: 'Truck 2', color: '#60A5FA' },
+      { id: 'dana', name: 'Dana K.', truck: 'Truck 3', color: '#A78BFA' },
+    ];
+    const DEMO_JOBS = [
+      { day: 0, start: '8:00', end: '9:30', title: 'Slab leak repair', customer: 'Marcus Reed', area: 'Zilker', tech: 'ramiro', status: 'booked', value: 640 },
+      { day: 0, start: '13:00', end: '14:30', title: 'Water heater swap', customer: 'Priya Shah', area: 'The Domain', tech: 'dana', status: 'booked', value: 980 },
+      { day: 1, start: '9:00', end: '10:00', title: 'Drain snake + camera', customer: 'Elena Ortiz', area: 'East Austin', tech: 'luis', status: 'pending', value: 320 },
+      { day: 2, start: '10:30', end: '12:00', title: 'Burst pipe repair', customer: 'Devon Brooks', area: 'Round Rock', tech: 'luis', status: 'booked', value: 480 },
+      { day: 3, start: '8:30', end: '10:00', title: 'Toilet rebuild', customer: 'Tasha Nguyen', area: 'South Austin', tech: 'ramiro', status: 'booked', value: 240 },
+      { day: 4, start: '15:00', end: '16:30', title: 'Slab leak estimate', customer: 'Nora Ellis', area: 'Zilker', tech: 'dana', status: 'pending', value: 0 },
+      { day: 5, start: '9:00', end: '11:00', title: 'Repipe walkthrough', customer: 'Owen Park', area: 'Round Rock', tech: 'luis', status: 'booked', value: 1450 },
+    ];
+
+    function startOfWeek(date) {
+      const d = new Date(date);
+      const day = (d.getDay() + 6) % 7;
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - day);
+      return d;
+    }
+
+    function renderBookings(leads, plumber) {
+      const grid = $('weekGrid'); if (!grid) return;
+      const start = state.weekStart || startOfWeek(new Date());
+      state.weekStart = start;
+      const days = Array.from({ length: 7 }, (_, index) => {
+        const d = new Date(start); d.setDate(start.getDate() + index); return d;
+      });
+      const range = $('calendarRange');
+      if (range) range.textContent = `${days[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${days[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} · Austin, TX`;
+
+      const jobs = [];
+      (leads || []).filter((lead) => lead.status !== 'closed_lost').forEach((lead, index) => {
+        const tech = TECHS[index % TECHS.length];
+        const booked = lead.status === 'booked';
+        jobs.push({
+          day: index % 7,
+          start: `${9 + (index % 6)}:00`,
+          end: `${10 + (index % 6)}:30`,
+          title: jobCategory(lead.issue_summary) || (booked ? 'Booked service call' : 'Callback needed'),
+          customer: lead.caller_name || 'Austin caller',
+          area: areaForZip(lead.zip_code),
+          tech: tech.id,
+          status: booked ? 'booked' : 'pending',
+          value: lead.estimated_value_usd || (plumber && plumber.avg_ticket_usd) || 480,
+          demo: false,
+        });
+      });
+      DEMO_JOBS.forEach((job) => jobs.push({ ...job, demo: true }));
+
+      grid.innerHTML = days.map((date, index) => {
+        const dayJobs = jobs
+          .filter((job) => job.day === index && (state.tech === 'all' || state.tech === job.tech))
+          .sort((a, b) => a.start.localeCompare(b.start));
+        const isToday = date.toDateString() === new Date().toDateString();
+        const blocks = dayJobs.map((job) => {
+          const tech = TECHS.find((item) => item.id === job.tech);
+          const detail = `${job.customer} · ${job.area} · ${job.start}–${job.end} · ${tech ? tech.name + ' / ' + tech.truck : 'Unassigned'}${job.value ? ' · ' + money(job.value) : ''}${job.demo ? ' · sample row' : ''}`;
+          return `<button class="job is-${job.status}${job.demo ? ' is-demo' : ''}" type="button" data-tech="${esc(job.tech)}" data-job="${esc(detail)}" data-demo="${job.demo ? '1' : '0'}">
+            <strong>${esc(job.title)}</strong>
+            <span>${esc(job.start)} · ${esc(job.area)}${job.value ? ' · ' + esc(money(job.value)) : ''}</span>
+          </button>`;
+        }).join('');
+        return `<div class="day-col">
+          <div class="day-head${isToday ? ' is-today' : ''}"><strong>${date.toLocaleDateString('en-US', { weekday: 'short' })}</strong><span>${date.getDate()}</span></div>
+          <div class="day-jobs">${blocks || '<span class="tiny" style="color:#94A3B8;padding:4px 2px">Open</span>'}</div>
+        </div>`;
+      }).join('');
+    }
+    const SMS_LOG = [
+      { time: '9:42 AM', name: 'Marcus Reed · Zilker', body: 'Confirmed: today 8:00–9:30 for the slab leak. Reply C to reschedule.', status: 'Delivered', kind: 'badge-booked' },
+      { time: '9:10 AM', name: 'Priya Shah · Round Rock', body: 'Water heater install confirmed for 1:00 PM. Tech: Dana K. · Truck 3.', status: 'Delivered', kind: 'badge-booked' },
+      { time: '8:55 AM', name: 'Devon Brooks · The Domain', body: 'Reminder: shut off the supply valve if safe. Luis is 25 minutes out.', status: 'Scheduled', kind: 'badge-standard' },
+      { time: '8:21 AM', name: 'Elena Ortiz · East Austin', body: 'Follow-up: did the kitchen drain hold overnight? Reply 1 for yes, 2 for no.', status: 'Awaiting reply', kind: 'badge-ready' },
+    ];
+
+    function renderSmsLog() {
+      const list = $('smsLogList'); if (!list) return;
+      list.innerHTML = SMS_LOG.map((item) => `
+        <div class="sms-item">
+          <span class="sms-time">${esc(item.time)}</span>
+          <div class="sms-body"><strong>${esc(item.name)}</strong><span>${esc(item.body)}</span></div>
+          <span class="badge ${item.kind}">${esc(item.status)}</span>
+        </div>`).join('');
+    }
+
+    function updateRoi() {
+      const missedEl = $('roiMissed');
+      const valueEl = $('roiValue');
+      if (!missedEl || !valueEl) return;
+      const missed = Number(missedEl.value) || 0;
+      const jobValue = Number(valueEl.value) || 0;
+      const recoveredJobs = Math.round(missed * 0.65);
+      const recovered = recoveredJobs * jobValue;
+      const roi = recovered / 99;
+      if ($('roiMissedOut')) $('roiMissedOut').textContent = String(missed);
+      if ($('roiValueOut')) $('roiValueOut').textContent = money(jobValue);
+      if ($('roiRecovered')) $('roiRecovered').textContent = money(recovered);
+      if ($('roiMultiplier')) $('roiMultiplier').textContent = (roi >= 100 ? Math.round(roi) : roi.toFixed(1)) + '×';
+      if ($('roiJobs')) $('roiJobs').textContent = `≈ ${recoveredJobs} jobs kept in Austin`;
+    }
+    /* ---------------- billing ---------------- */
+    function renderBilling(billing) {
+      const planType = String(billing.plan_type || '').toLowerCase();
+      const planLabel = planType === 'demo'
+        ? 'Demo · full access'
+        : (planType === 'solo' || billing.plan_code === 'solo_99')
+          ? 'Solo · $99/mo'
+          : planType === 'trial'
+            ? 'Trial · $0 · 3 days'
+            : (billing.plan_code || 'Trial');
+      if ($('planCode')) $('planCode').textContent = planLabel;
+
+      const used = Number(billing.used_minutes) || 0;
+      const included = Number(billing.included_minutes) || 0;
+      if ($('planMinutes')) $('planMinutes').textContent = `${used} / ${included}`;
+
+      const pct = included > 0 ? Math.min(100, Math.round((used / included) * 100)) : 0;
+      if ($('planProgress')) $('planProgress').style.width = pct + '%';
+      const wrap = $('planProgressWrap');
+      if (wrap) {
+        wrap.setAttribute('aria-valuenow', String(pct));
+        wrap.setAttribute('aria-valuetext', `${used} of ${included} minutes used`);
+        wrap.classList.toggle('is-high', pct >= 75 && pct < 100);
+        wrap.classList.toggle('is-full', pct >= 100);
+      }
+
+      if ($('planRemaining')) {
+        const minutesLeft = `${Math.max(0, Number(billing.remaining_minutes) || 0)} min remaining`;
+        const trialUsage = planType === 'trial' || billing.is_trial
+          ? ` · ${Number(billing.leads_today) || 0}/${Number(billing.daily_lead_limit) || 5} leads today`
+          : '';
+        $('planRemaining').textContent = minutesLeft + trialUsage;
+      }
+
+      const statusText = String(billing.status || 'none').replace(/_/g, ' ');
+      const badge = $('planBadgeSettings');
+      if (badge) { badge.textContent = statusText; badge.className = 'badge ' + planBadgeClass(billing.status); }
+      const statusPill = $('planStatusBadge');
+      if (statusPill) {
+        statusPill.className = 'status-pill ' + (billing.status === 'active' ? 'is-ok' : 'is-warn');
+        const label = statusPill.querySelector('span:last-child');
+        if (label) label.textContent = 'Plan · ' + statusText;
+      }
+
+      if ($('planPeriod')) {
+        if (billing.trial_ends_at && planType !== 'solo' && planType !== 'demo') {
+          const when = new Date(billing.trial_ends_at);
+          $('planPeriod').textContent = Number.isNaN(when.getTime()) ? 'Trial active' : `Trial ends ${when.toLocaleDateString()}`;
+        } else if (billing.current_period_end) {
+          const when = new Date(billing.current_period_end);
+          $('planPeriod').textContent = Number.isNaN(when.getTime()) ? 'Renews soon' : `Renews ${when.toLocaleDateString()}`;
+        } else {
+          $('planPeriod').textContent = billing.status === 'trialing' ? 'Trial period' : 'No renewal date';
+        }
+      }
+
+      const missing = Array.isArray(billing.missing) ? billing.missing : [];
+      const notice = $('billingNotice');
+      if (notice) {
+        if (!billing.ready_for_checkout && missing.length) {
+          notice.hidden = false;
+          if ($('billingNoticeText')) $('billingNoticeText').innerHTML = 'Checkout needs ' + missing.map((key) => `<code>${esc(key)}</code>`).join(' and ') + ' in <code>.env</code>, then restart the server.';
+        } else {
+          notice.hidden = true;
+          if ($('billingNoticeText')) $('billingNoticeText').textContent = '';
+        }
+      }
+
+      const button = $('startPlanBtn');
+      if (button) {
+        button.disabled = false;
+        button.textContent = billing.status === 'active' ? 'Manage Solo subscription' : 'Subscribe to Solo — $99/mo';
+      }
+    }
+
+    async function loadBilling(announce) {
+      try {
+        const res = await fetch('/api/billing/status', { cache: 'no-store' });
+        if (res.status === 401) { window.location.assign('/?login=1'); return null; }
+        if (!res.ok) throw new Error('billing unavailable');
+        const billing = await res.json();
+        renderBilling(billing);
+        if (announce) setBillingStatus(`Billing status refreshed · ${billing.status}.`, 'ok');
+        return billing;
+      } catch {
+        if (announce) setBillingStatus('Could not load billing status right now.', 'err');
+        return null;
+      }
+    }
+
+    async function startCheckout(statusId = 'billingStatus', buttonId = 'startPlanBtn') {
+      const button = $(buttonId) || $('startPlanBtn');
+      const original = button ? button.textContent : '';
+      if (button) { button.disabled = true; button.textContent = 'Opening secure checkout…'; }
+      setStatusOn(statusId, '');
+      try {
+        const res = await fetch('/api/billing/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '{}',
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) { window.location.assign('/?login=1'); return; }
+        if (res.ok && data.ok && data.checkoutUrl) {
+          setStatusOn(statusId, 'Redirecting to Dodo Payments…', 'ok');
+          window.location.assign(data.checkoutUrl);
+          return;
+        }
+        if (data.configured === false) {
+          const missing = Array.isArray(data.missing) ? data.missing.join(', ') : 'DODO_API_KEY, DODO_PLAN_SOLO_ID';
+          setStatusOn(statusId, `Checkout needs ${missing} in .env.`, 'err');
+        } else {
+          setStatusOn(statusId, data.message || 'Checkout could not be created.', 'err');
+        }
+      } catch {
+        setStatusOn(statusId, 'Network error while contacting billing.', 'err');
+      } finally {
+        if (button) { button.disabled = false; button.textContent = original; }
+      }
+    }
+    /* ---------------- web push + simulate ---------------- */
+    const b64ToBytes = (b64) => Uint8Array.from(
+      Array.from(window.atob((b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'))).map((ch) => ch.charCodeAt(0))
+    );
+
+    function setPushStatus(text, ok) {
+      const el = $('settingsPushText');
+      if (el) el.textContent = text;
+      const agentEl = $('agentPushState');
+      if (agentEl) agentEl.textContent = text;
+      const dot = $('settingsPushDot');
+      if (dot) dot.className = 'dot' + (ok ? '' : ' warn');
+    }
+
+    async function initPush() {
+      try {
+        const health = await (await fetch('/api/health', { cache: 'no-store' })).json();
+        state.vapidPublicKey = health.vapidPublicKey;
+        state.pushEnabled = Boolean(health.pushEnabled);
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+          setPushStatus('Not supported in this browser', false);
+          return;
+        }
+        await navigator.serviceWorker.register('/sw.js');
+        if (!health.pushEnabled) {
+          setPushStatus('VAPID keys missing', false);
+          return;
+        }
+        const permission = typeof Notification !== 'undefined' ? Notification.permission : 'default';
+        if (permission === 'granted') setPushStatus('Ready on this device', true);
+        else if (permission === 'denied') setPushStatus('Blocked in browser', false);
+        else setPushStatus('Tap Enable Web Push', false);
+      } catch {
+        setPushStatus('Status unavailable', false);
+      }
+    }
+
+    async function enablePush(buttonArg) {
+      const button = buttonArg || $('enablePushBtn') || $('settingsPushBtn');
+      if (button) button.disabled = true;
+      try {
+        if (!state.vapidPublicKey) await initPush();
+        if (!state.vapidPublicKey) { setLive('Push is not configured on the server (VAPID keys missing).'); return; }
+        if (!('serviceWorker' in navigator)) { setLive('This browser cannot register a service worker.'); return; }
+        if (typeof Notification === 'undefined') { setLive('Notifications are not available in this browser.'); return; }
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') { setLive('Notification permission was not granted.'); return; }
+        const registration = await navigator.serviceWorker.ready;
+        const existing = await registration.pushManager.getSubscription();
+        const subscription = existing || await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: b64ToBytes(state.vapidPublicKey),
+        });
+        const res = await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription: subscription.toJSON(), deviceLabel: navigator.userAgent.slice(0, 50) }),
+        });
+        if (!res.ok) throw new Error('subscribe failed');
+        if (button) button.textContent = 'Web Push Enabled';
+        setPushStatus('Ready on this device', true);
+        if (typeof window.callflowRefreshSetup === 'function') window.callflowRefreshSetup();
+        await loadState();
+        setLive('Web Push enabled — you will be alerted on new calls.');
+      } catch (err) {
+        setLive('Could not enable Web Push: ' + ((err && err.message) || 'unknown error'));
+      } finally {
+        if (button) button.disabled = false;
+      }
+    }
+
+    const SIM_SCENARIOS = [
+      { caller_phone: '+15125550188', urgency: 'emergency', zip_code: '78758', issue_summary: 'Water heater leaking onto garage floor near Burnet Rd', duration_seconds: 54 },
+      { caller_phone: '+15125550177', urgency: 'emergency', zip_code: '78704', issue_summary: 'Burst pipe under Zilker kitchen sink — water shut off at the street', duration_seconds: 48 },
+      { caller_phone: '+15125550166', urgency: 'standard', zip_code: '78664', issue_summary: 'Round Rock bathroom drain backing up after morning showers', duration_seconds: 41 },
+    ];
+
+    async function simulateCall(buttonArg) {
+      const button = buttonArg || $('testSimBtn');
+      const original = button ? button.textContent : '';
+      if (button) { button.disabled = true; button.textContent = 'Simulating…'; }
+      try {
+        const scenario = SIM_SCENARIOS[Math.floor(Math.random() * SIM_SCENARIOS.length)];
+        const res = await fetch('/api/simulate-call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scenario),
+        });
+        if (!res.ok) throw new Error('simulate failed');
+        await loadState();
+        setLive('Simulated missed call added to the queue.');
+        if (buttonArg && buttonArg.id === 'agentTestCallBtn') setStatusOn('agentStatus', 'Test call completed — the new lead is in Call Logs.', 'ok');
+      } catch {
+        setLive('Could not simulate a call right now.');
+        if (buttonArg && buttonArg.id === 'agentTestCallBtn') setStatusOn('agentStatus', 'Test call failed — check the server connection.', 'err');
+      } finally {
+        if (button) { button.disabled = false; button.textContent = original; }
+      }
+    }
+    /* ---------------- settings + agent draft ---------------- */
+    async function saveSettings(event) {
+      event.preventDefault();
+      const status = $('settingsStatus');
+      const value = (id) => ($(id) ? $(id).value.trim() : '');
+      const payload = {
+        owner_name: value('ownerName'),
+        business_name: value('businessName'),
+        email: value('plumberEmail'),
+        established_line: value('establishedLine'),
+        telnyx_number: value('telnyxNumber'),
+        owner_phone: value('ownerPhone'),
+        avg_ticket_usd: Number($('avgTicket').value) || 0,
+        service_area_note: value('serviceArea'),
+      };
+      if (status) { status.textContent = 'Saving…'; status.className = 'form-status'; }
+      try {
+        const res = await fetch('/api/plumber/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) throw new Error(data.error || 'save failed');
+        const primary = data.plumber && data.plumber.telnyx_number ? formatPhone(data.plumber.telnyx_number) : 'not set';
+        if (status) { status.textContent = `Saved · primary forwarding number ${primary}`; status.className = 'form-status ok'; }
+        if (typeof window.callflowRefreshSetup === 'function') window.callflowRefreshSetup();
+        await loadState();
+        await loadBilling(false);
+      } catch (err) {
+        if (status) {
+          status.textContent = err.message === 'invalid_phone_number'
+            ? 'That forwarding number is not valid — use E.164 format like +15125550199.'
+            : `Could not save: ${err.message}`;
+          status.className = 'form-status err';
+        }
+      }
+    }
+
+    const AGENT_KEY = 'callflow_agent_config_v1';
+    function readAgentConfig() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(AGENT_KEY) || '{}') || {}; } catch { saved = {}; }
+      return { voice: 'warm', greeting: '', emergencyRouting: true, afterHours: true, ...saved };
+    }
+    function greetingFor(plumber) {
+      const shop = (plumber && plumber.business_name) || 'South Congress Plumbing';
+      return `Thanks for calling ${shop}. I’m the CallFlow assistant — are you dealing with a leak, a water heater, or a drain backup today?`;
+    }
+    function paintAgent() {
+      const config = readAgentConfig();
+      const greeting = $('agentGreeting');
+      const text = config.greeting || greetingFor(state.plumber);
+      if (greeting && document.activeElement !== greeting) greeting.value = text;
+      const preview = $('agentGreetingPreview');
+      if (preview) preview.textContent = text;
+      document.querySelectorAll('[data-voice]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.voice === (config.voice || 'warm')));
+      });
+      if ($('emergencyRouting')) $('emergencyRouting').checked = config.emergencyRouting !== false;
+      if ($('afterHoursRouting')) $('afterHoursRouting').checked = config.afterHours !== false;
+    }
+    function showAgentStep(key) {
+      document.querySelectorAll('[data-agent-panel]').forEach((panel) => { panel.hidden = panel.dataset.agentPanel !== key; });
+      document.querySelectorAll('[data-agent-step]').forEach((button) => {
+        const active = button.dataset.agentStep === key;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-selected', String(active));
+      });
+    }
+    function saveAgentDraft() {
+      const activeVoice = document.querySelector('[data-voice][aria-pressed="true"]');
+      const config = {
+        voice: activeVoice ? activeVoice.dataset.voice : 'warm',
+        greeting: ($('agentGreeting') ? $('agentGreeting').value : '').trim() || greetingFor(state.plumber),
+        emergencyRouting: $('emergencyRouting') ? $('emergencyRouting').checked : true,
+        afterHours: $('afterHoursRouting') ? $('afterHoursRouting').checked : true,
+        savedAt: new Date().toISOString(),
+      };
+      try { localStorage.setItem(AGENT_KEY, JSON.stringify(config)); } catch { /* ignore */ }
+      setStatusOn('agentStatus', 'Agent draft saved on this device. Connect Dograh to push these rules live.', 'ok');
+      setLive('AI agent draft saved · telephony sync pending.');
+    }
+    /* ---------------- wiring ---------------- */
+    document.querySelectorAll('.nav-pill[data-view]').forEach((tab) => {
+      tab.addEventListener('click', () => selectView(tab.dataset.view));
+    });
+
+    $('enablePushBtn').addEventListener('click', () => enablePush($('enablePushBtn')));
+    $('testSimBtn').addEventListener('click', () => simulateCall($('testSimBtn')));
+    $('startPlanBtn').addEventListener('click', () => startCheckout('billingStatus', 'startPlanBtn'));
+    $('settingsPushBtn').addEventListener('click', () => enablePush($('settingsPushBtn')));
+    $('settingsSetupBtn').addEventListener('click', () => $('setupBtn').click());
+
+    $('refreshQueueBtn').addEventListener('click', async () => {
+      try { await loadState(); } catch { setLive('Could not refresh the feed.'); }
+      await loadBilling(true);
+    });
+    $('dashboardRefreshBtn').addEventListener('click', async () => {
+      try { await loadState(); } catch { setLive('Could not refresh the workspace.'); }
+      await loadBilling(false);
+      setLive('Workspace refreshed · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    });
+
+    const profileBtn = $('profileBtn');
+    const profileDrop = $('profileDrop');
+    const closeProfile = () => {
+      if (!profileDrop) return;
+      profileDrop.hidden = true;
+      profileBtn.setAttribute('aria-expanded', 'false');
+    };
+    profileBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      profileDrop.hidden = !profileDrop.hidden;
+      profileBtn.setAttribute('aria-expanded', String(!profileDrop.hidden));
+    });
+    profileDrop.addEventListener('click', (event) => {
+      if (event.target.closest('button')) closeProfile();
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('#profileMenu')) closeProfile();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeProfile();
+    });
+    $('logoutBtn').addEventListener('click', async () => {
+      try { await fetch('/api/auth/logout', { method: 'POST' }); } catch { /* clear locally anyway */ }
+      window.location.assign('/');
+    });
+
+    const leadActionHandler = (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      updateLead(button.dataset.id, { status: button.dataset.action });
+    };
+    $('leadsList').addEventListener('click', leadActionHandler);
+    $('callLogsBody').addEventListener('click', leadActionHandler);
+
+    $('settingsForm').addEventListener('submit', saveSettings);
+
+    document.querySelectorAll('[data-log-filter]').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.logFilter = button.dataset.logFilter;
+        document.querySelectorAll('[data-log-filter]').forEach((item) => {
+          item.setAttribute('aria-pressed', String(item === button));
+          item.classList.toggle('is-active', item === button);
+        });
+        renderCallLogs();
+      });
+    });
+    $('logSearch').addEventListener('input', (event) => {
+      state.logQuery = event.target.value;
+      renderCallLogs();
+    });
+
+    document.querySelectorAll('[data-tech]').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.tech = button.dataset.tech;
+        document.querySelectorAll('[data-tech]').forEach((item) => {
+          item.setAttribute('aria-pressed', String(item === button));
+          item.classList.toggle('is-active', item === button);
+        });
+        renderBookings(state.leads, state.plumber);
+      });
+    });
+
+    $('weekGrid').addEventListener('click', (event) => {
+      const job = event.target.closest('.job');
+      if (!job) return;
+      const status = $('bookingStatus');
+      if (status) status.textContent = job.dataset.job + ' · ' + (job.dataset.demo === '1' ? 'Sample schedule row' : 'Live booking');
+    });
+
+    $('calendarTodayBtn').addEventListener('click', () => {
+      state.weekStart = startOfWeek(new Date());
+      renderBookings(state.leads, state.plumber);
+      const status = $('calendarSyncStatus');
+      if (status) status.textContent = 'Showing this week · Austin, TX';
+    });
+    $('calendarSyncBtn').addEventListener('click', () => {
+      const status = $('calendarSyncStatus');
+      if (status) status.textContent = 'Google Calendar is not connected. Add OAuth credentials to enable two-way sync.';
+      const note = $('bookingStatus');
+      if (note) note.textContent = 'No calendar events were changed — integration credentials are not configured.';
+    });
+
+    document.querySelectorAll('[data-agent-step]').forEach((button) => {
+      button.addEventListener('click', () => showAgentStep(button.dataset.agentStep));
+    });
+    document.querySelectorAll('[data-voice]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-voice]').forEach((item) => {
+          item.setAttribute('aria-pressed', 'false');
+          item.classList.remove('is-active');
+        });
+        button.setAttribute('aria-pressed', 'true');
+        button.classList.add('is-active');
+        setStatusOn('agentStatus', 'Voice changed — save the draft to keep it on this device.', '');
+      });
+    });
+    const greetingInput = $('agentGreeting');
+    if (greetingInput) {
+      greetingInput.addEventListener('input', () => {
+        const preview = $('agentGreetingPreview');
+        if (preview) preview.textContent = greetingInput.value;
+      });
+    }
+    $('agentSaveBtn').addEventListener('click', saveAgentDraft);
+    $('agentTestCallBtn').addEventListener('click', () => simulateCall($('agentTestCallBtn')));
+    $('agentCopyNumberBtn').addEventListener('click', async () => {
+      const number = (state.plumber && state.plumber.telnyx_number) || ($('agentNumber') ? $('agentNumber').textContent : '');
+      if (!number) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(number);
+        else {
+          const area = document.createElement('textarea');
+          area.value = number; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+        }
+        setStatusOn('agentStatus', 'Number copied to clipboard.', 'ok');
+      } catch {
+        setStatusOn('agentStatus', 'Copy blocked — long-press the number instead.', 'err');
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const go = event.target.closest('[data-goto-view]');
+      if (go) selectView(go.dataset.gotoView);
+    });
+    const billingBanner = $('billingBanner');
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('billing') === 'success') {
+      billingBanner.hidden = false;
+      setBillingStatus('Payment received — refresh billing status to confirm your plan.', 'ok');
+    }
+    $('dismissBannerBtn').addEventListener('click', () => {
+      billingBanner.hidden = true;
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('billing');
+        window.history.replaceState(null, '', url);
+      } catch { /* ignore */ }
+    });
+    $('refreshBillingBtn').addEventListener('click', async () => {
+      const billing = await loadBilling(false);
+      if (billing) setBillingStatus(`Billing status refreshed · ${billing.status}${billing.current_period_end ? ' · renews ' + new Date(billing.current_period_end).toLocaleDateString() : ''}`, 'ok');
+      else setBillingStatus('Could not load billing status right now.', 'err');
+      try { await loadState(); } catch { /* ignore */ }
+    });
+    $('settingsRefreshBillingBtn').addEventListener('click', async () => {
+      const billing = await loadBilling(true);
+      if (billing) setStatusOn('settingsStatus', `Billing status refreshed · ${billing.status}.`, 'ok');
+      try { await loadState(); } catch { /* ignore */ }
+    });
+
+    const initialHash = window.location.hash.replace('#', '');
+    if (params.get('lead')) selectView('logs');
+    else if (initialHash === 'overview') selectView('dashboard');
+    else if (VIEW_KEYS.includes(initialHash)) selectView(initialHash);
+
+    async function loadSession() {
+      try {
+        const res = await fetch('/api/auth/me', { cache: 'no-store' });
+        if (!res.ok) { window.location.assign('/?login=1'); return null; }
+        const data = await res.json();
+        state.accountEmail = (data.user && data.user.email) || '';
+        return data;
+      } catch {
+        window.location.assign('/?login=1');
+        return null;
+      }
+    }
+
+    (async function init() {
+      const session = await loadSession();
+      if (!session) return;
+      renderSmsLog();
+      showAgentStep('details');
+      paintAgent();
+      try {
+        await loadState();
+      } catch {
+        setLive('Offline — retrying automatically…');
+      }
+      await loadBilling(false);
+      await initPush();
+      window.setInterval(() => {
+        if (!document.hidden) loadState().catch(() => {});
+      }, 20000);
+    })();
+    /* ---------------- onboarding + setup readiness ---------------- */
+    (function onboarding() {
+      const $o = (id) => document.getElementById(id);
+      const ONBOARD_KEY = 'callflow_onboarded_v1';
+      const STRIP_KEY = 'callflow_setup_strip_dismissed_v1';
+      const PANEL_FOR_STEP = { shop: 'shop', push: 'forwarding', forwarding: 'forwarding', plan: 'plan' };
+      let boot = null;
+      let activeStep = 'shop';
+      const keyFor = (base) => `${base}:${(boot && boot.plumber && boot.plumber.id) || 'shop'}`;
+
+      function statusFor(id, text, kind) {
+        const el = $o(id); if (!el) return;
+        el.textContent = text || '';
+        el.className = 'form-status' + (kind ? ' ' + kind : '');
+      }
+
+      function paintReadiness(readiness) {
+        const okWebhook = Boolean(readiness && readiness.webhook_ready);
+        const webhook = $o('webhookStatus');
+        if (webhook) {
+          webhook.classList.toggle('is-ok', okWebhook);
+          webhook.classList.toggle('is-warn', !okWebhook);
+          const label = webhook.querySelector('span:last-child');
+          if (label) label.textContent = okWebhook ? 'Webhooks live' : 'Webhooks off';
+        }
+        const ready = Boolean(readiness && readiness.push_ready);
+        const devices = readiness ? Number(readiness.push_devices) || 0 : 0;
+        const push = $o('pushReadyStatus');
+        if (push) {
+          push.classList.toggle('is-ok', ready && devices > 0);
+          push.classList.toggle('is-warn', !ready || devices === 0);
+          const label = push.querySelector('span:last-child');
+          if (label) label.textContent = devices > 0 ? `Push · ${devices} ${devices === 1 ? 'device' : 'devices'}` : (ready ? 'Push · no devices' : 'Push off');
+        }
+        const pushText = $o('settingsPushText');
+        if (pushText) pushText.textContent = devices > 0 ? `${devices} ${devices === 1 ? 'device' : 'devices'} ready` : (ready ? 'No devices yet' : 'VAPID keys missing');
+        const pushDot = $o('settingsPushDot');
+        if (pushDot) pushDot.className = 'dot' + (ready && devices > 0 ? '' : ' warn');
+        const webhookText = $o('settingsWebhookText');
+        if (webhookText) webhookText.textContent = okWebhook ? 'Live' : 'Not configured';
+        const webhookDot = $o('settingsWebhookDot');
+        if (webhookDot) webhookDot.className = 'dot' + (okWebhook ? '' : ' off');
+        const agentPush = $o('agentPushState');
+        if (agentPush) agentPush.textContent = devices > 0 ? `${devices} device${devices === 1 ? '' : 's'}` : (ready ? 'Ready · no devices' : 'Not configured');
+      }
+
+      function pillsMarkup(steps) {
+        return steps.map((step, index) => {
+          const classes = ['pill', step.complete ? 'is-done' : '', step.key === activeStep ? 'is-active' : ''].filter(Boolean).join(' ');
+          return '<button type="button" class="' + classes + '" data-setup-step="' + step.key + '"' + (step.complete ? ' disabled' : '') + '>' +
+            '<span class="pill-num">' + (step.complete ? '✓' : index + 1) + '</span>' + esc(step.label) + '</button>';
+        }).join('');
+      }
+
+      function paintSetup() {
+        if (!boot || !boot.onboarding) return;
+        const steps = boot.onboarding.steps || [];
+        const done = steps.filter((step) => step.complete).length;
+        const complete = Boolean(boot.onboarding.complete);
+        let seen = null;
+        let dismissed = false;
+        try { seen = localStorage.getItem(keyFor(ONBOARD_KEY)); dismissed = localStorage.getItem(keyFor(STRIP_KEY)) === '1'; } catch { /* ignore */ }
+        const strip = $o('setupStrip');
+        if (strip) {
+          const show = Boolean(seen) && !complete && !dismissed;
+          strip.hidden = !show;
+          const count = $o('setupCount');
+          if (count) count.textContent = done + '/' + steps.length;
+          const pills = $o('setupPills');
+          if (pills && show) pills.innerHTML = pillsMarkup(steps);
+        }
+        const wizardProgress = $o('wizardProgress');
+        if (wizardProgress) wizardProgress.innerHTML = pillsMarkup(steps);
+        const number = $o('wizardNumber');
+        if (number) number.textContent = boot.plumber && boot.plumber.telnyx_number ? formatPhone(boot.plumber.telnyx_number) : 'Not assigned yet';
+      }
+      function fillWizardForm(plumber) {
+        if (!plumber) return;
+        const set = (id, value) => {
+          const el = $o(id);
+          if (el && document.activeElement !== el) el.value = value || '';
+        };
+        set('wOwnerName', plumber.owner_name);
+        set('wBusinessName', plumber.business_name);
+        set('wEmail', plumber.email || '');
+        set('wPhone', plumber.owner_phone ? formatPhone(plumber.owner_phone) : '');
+      }
+
+      function showStep(key) {
+        activeStep = PANEL_FOR_STEP[key] ? key : 'shop';
+        const panel = PANEL_FOR_STEP[activeStep];
+        document.querySelectorAll('.wizard-step').forEach((section) => { section.hidden = section.dataset.step !== panel; });
+        paintSetup();
+        const heading = document.querySelector('.wizard-step[data-step="' + panel + '"] h3');
+        const overlay = $o('onboardingOverlay');
+        if (heading && overlay && !overlay.hidden) heading.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+
+      function openWizard(stepKey) {
+        const overlay = $o('onboardingOverlay');
+        if (!overlay) return;
+        fillWizardForm(boot && boot.plumber);
+        overlay.hidden = false;
+        document.body.classList.add('has-overlay');
+        showStep(stepKey || activeStep || 'shop');
+        const close = $o('wizardClose');
+        if (close) close.focus();
+      }
+      window.callflowOpenSetup = openWizard;
+
+      function closeWizard(markSeen) {
+        const overlay = $o('onboardingOverlay');
+        if (overlay) overlay.hidden = true;
+        document.body.classList.remove('has-overlay');
+        if (markSeen) { try { localStorage.setItem(keyFor(ONBOARD_KEY), String(Date.now())); } catch { /* ignore */ } }
+        paintSetup();
+      }
+
+      async function refreshSetup() {
+        try {
+          const res = await fetch('/api/bootstrap', { cache: 'no-store' });
+          if (res.status === 401) { window.location.assign('/?login=1'); return null; }
+          if (!res.ok) return null;
+          boot = await res.json();
+          paintReadiness(boot.readiness);
+          fillWizardForm(boot.plumber);
+          paintSetup();
+          return boot;
+        } catch {
+          return null;
+        }
+      }
+      window.callflowRefreshSetup = refreshSetup;
+      const setupBtn = $o('setupBtn');
+      if (setupBtn) setupBtn.addEventListener('click', () => openWizard(activeStep));
+
+      const wizardClose = $o('wizardClose');
+      if (wizardClose) wizardClose.addEventListener('click', () => closeWizard(true));
+
+      const overlayEl = $o('onboardingOverlay');
+      if (overlayEl) overlayEl.addEventListener('click', (event) => { if (event.target === overlayEl) closeWizard(true); });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && overlayEl && !overlayEl.hidden) closeWizard(true);
+      });
+
+      document.addEventListener('click', (event) => {
+        const pill = event.target.closest('[data-setup-step]');
+        if (pill) { openWizard(pill.dataset.setupStep); return; }
+        const next = event.target.closest('[data-wizard-next]');
+        if (next) { showStep(next.dataset.wizardNext); return; }
+        const opener = event.target.closest('[data-open-setup]');
+        if (opener) openWizard(opener.dataset.openSetup || 'shop');
+      });
+
+      const stripDismiss = $o('setupStripDismiss');
+      if (stripDismiss) stripDismiss.addEventListener('click', () => {
+        try { localStorage.setItem(keyFor(STRIP_KEY), '1'); } catch { /* ignore */ }
+        const strip = $o('setupStrip');
+        if (strip) strip.hidden = true;
+      });
+
+      const wizardForm = $o('wizardForm');
+      if (wizardForm) wizardForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const value = (id) => { const el = $o(id); return el ? el.value.trim() : ''; };
+        statusFor('wizardStatus', 'Saving your business profile…');
+        try {
+          const res = await fetch('/api/plumber/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              owner_name: value('wOwnerName'),
+              business_name: value('wBusinessName'),
+              email: value('wEmail'),
+              owner_phone: value('wPhone'),
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data.ok === false) throw new Error(data.error || 'save_failed');
+          statusFor('wizardStatus', 'Saved — your business profile is live.', 'ok');
+          await refreshSetup();
+          if (typeof loadState === 'function') { try { await loadState(); } catch { /* ignore */ } }
+          if (typeof loadBilling === 'function') { try { await loadBilling(false); } catch { /* ignore */ } }
+          window.setTimeout(() => showStep('forwarding'), 450);
+        } catch (err) {
+          const message = err && err.message === 'invalid_email'
+            ? 'Enter a valid billing email, e.g. billing@yourshop.com.'
+            : 'Could not save: ' + ((err && err.message) || 'unknown error');
+          statusFor('wizardStatus', message, 'err');
+        }
+      });
+      const copyBtn = $o('copyNumberBtn');
+      if (copyBtn) copyBtn.addEventListener('click', async () => {
+        const number = boot && boot.plumber && boot.plumber.telnyx_number ? boot.plumber.telnyx_number : '';
+        if (!number) { statusFor('wizardPushStatus', 'No forwarding number yet — save business details first.', 'err'); return; }
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(number);
+          else {
+            const area = document.createElement('textarea');
+            area.value = number; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+          }
+          copyBtn.textContent = 'Copied ✓';
+          window.setTimeout(() => { copyBtn.textContent = 'Copy number'; }, 1800);
+        } catch {
+          statusFor('wizardPushStatus', 'Copy blocked — long-press the number to copy it.', 'err');
+        }
+      });
+
+      const wizardPushBtn = $o('wizardPushBtn');
+      if (wizardPushBtn) wizardPushBtn.addEventListener('click', async () => {
+        statusFor('wizardPushStatus', 'Requesting notification permission…');
+        try {
+          if (typeof enablePush === 'function') await enablePush(wizardPushBtn);
+          await refreshSetup();
+          const devices = boot && boot.readiness ? Number(boot.readiness.push_devices) || 0 : 0;
+          if (devices > 0) statusFor('wizardPushStatus', 'Push alerts on · ' + devices + (devices === 1 ? ' device' : ' devices') + ' registered.', 'ok');
+          else statusFor('wizardPushStatus', 'Allow notifications in your browser to finish this step.', 'err');
+        } catch {
+          statusFor('wizardPushStatus', 'Could not enable push alerts.', 'err');
+        }
+      });
+
+      const wizardPlanBtn = $o('wizardPlanBtn');
+      if (wizardPlanBtn) wizardPlanBtn.addEventListener('click', () => {
+        if (typeof startCheckout === 'function') startCheckout('wizardPlanStatus', 'wizardPlanBtn');
+      });
+
+      const exploreBtn = $o('exploreBtn');
+      if (exploreBtn) exploreBtn.addEventListener('click', () => {
+        closeWizard(true);
+        if (typeof selectView === 'function') selectView('dashboard');
+        const feed = $o('callFeedCard');
+        if (feed) feed.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        if (typeof setLive === 'function') setLive('Dispatch demo — newest missed calls first.');
+      });
+
+      window.setInterval(() => {
+        const strip = $o('setupStrip');
+        if (!document.hidden && strip && !strip.hidden) refreshSetup();
+      }, 45000);
+
+      (async function init() {
+        const data = await refreshSetup();
+        if (!data || !data.plumber) return;
+        const incomplete = !data.onboarding || data.onboarding.complete === false;
+        if (!incomplete) return;
+        let seen = null;
+        try { seen = localStorage.getItem(keyFor(ONBOARD_KEY)); } catch { /* ignore */ }
+        if (!seen) openWizard('shop');
+      })();
+    })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

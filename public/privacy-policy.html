@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0D1B2A" />
+<title>Privacy Policy · CallFlow.biz</title>
+<meta name="description" content="How CallFlow (callflow.biz) handles plumbing business account data, caller lead details, cookies, retention and privacy requests." />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/legal.css" />
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap inner">
+    <a class="brand" href="/">
+      <span class="mark" aria-hidden="true">CF</span>
+      <span>
+        <strong>CallFlow.biz</strong>
+        <small>Missed-call recovery · Austin, TX</small>
+      </span>
+    </a>
+    <nav class="head-nav" aria-label="Site navigation">
+      <a href="/">Back to Home</a>
+      <a href="/app">Back to Dashboard</a>
+      <a class="is-primary" href="/contact">Contact Us</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="page-head">
+    <span class="kicker">Legal</span>
+    <h1>Privacy Policy</h1>
+    <p class="lede">How CallFlow collects, uses and protects business account and caller information when a plumbing shop routes unanswered calls to our AI receptionist.</p>
+    <div class="meta">
+      <span class="chip">Effective: [INSERT EFFECTIVE DATE]</span>
+      <span class="chip">Last updated: [INSERT LAST UPDATED DATE]</span>
+    </div>
+  </section>
+
+  <article class="doc">
+    <span class="placeholder">Before launch: replace <code>[INSERT LEGAL ENTITY NAME]</code>, <code>[INSERT PRIVACY EMAIL]</code>, <code>[INSERT BUSINESS MAILING ADDRESS]</code>, the effective date and the retention period below with your final details.</span>
+
+    <h2>1. Who we are</h2>
+    <p>CallFlow (“CallFlow”, “we”, “us”) is a missed-call recovery and AI dispatch service for plumbing businesses, operated at <strong>callflow.biz</strong> by <strong>[INSERT LEGAL ENTITY NAME]</strong>. This policy explains what we collect when a plumbing business (“shop”) creates a CallFlow account, when the CallFlow workspace is used, and when a caller’s call is answered by the CallFlow AI receptionist.</p>
+    <p>Privacy questions and requests: <strong>[INSERT PRIVACY EMAIL]</strong> (for example, <em>privacy@callflow.biz</em>).</p>
+
+    <h2>2. Information we collect</h2>
+    <h3>Business account and login information</h3>
+    <ul>
+      <li>Business name, owner name, work email, mobile number, existing phone line and service-area notes.</li>
+      <li>Authentication data: your email plus a salted, one-way password hash (we never store your password in readable form).</li>
+      <li>Session data: an opaque session ID stored in an HttpOnly cookie so you stay signed in to your workspace.</li>
+      <li>Plan, billing status and included/used AI call minutes.</li>
+    </ul>
+
+    <h3>Caller and lead data processed for plumbing shops</h3>
+    <p>When a call to a shop’s line goes unanswered and is forwarded to CallFlow, our AI receptionist may capture:</p>
+    <ul>
+      <li>Caller phone number and caller name if the caller provides it.</li>
+      <li>Call summary, issue description, urgency (emergency or standard), service ZIP code and street address if provided.</li>
+      <li>Call duration, transcript or structured notes, and the shop number that received the call.</li>
+      <li>Webhook delivery metadata used to confirm that a call record was received exactly once.</li>
+    </ul>
+    <p>This caller data belongs to the shop’s customer relationship. CallFlow processes it on the shop’s behalf to notify the shop, display the lead in the workspace and support booking follow-up. Shops are responsible for telling their callers that calls may be answered or recorded by an AI assistant where required by law.</p>
+
+    <h3>Billing information</h3>
+    <p>Payments and subscriptions are handled by Dodo Payments. CallFlow does not receive or store full card numbers. We store the Dodo customer and subscription identifiers, plan code, subscription status, billing period end and minute allowance so we can operate your plan.</p>
+
+    <h3>Technical and diagnostic data</h3>
+    <p>We record limited technical data such as IP address, browser user agent, request timestamps and webhook delivery logs to secure the service, debug integrations and prevent abuse.</p>
+
+    <h2>3. How we use information</h2>
+    <ul>
+      <li>Provide the workspace, AI call answering, lead capture, alerts and booking tools.</li>
+      <li>Authenticate users, keep sessions secure and protect accounts from unauthorized access.</li>
+      <li>Operate plans, enforce trial limits, meter included minutes and manage subscriptions.</li>
+      <li>Send operational alerts (for example web push notifications for new leads) and respond to support requests.</li>
+      <li>Maintain service reliability, investigate errors and comply with legal obligations.</li>
+    </ul>
+
+    <h2>4. Call recording, transcripts and AI processing</h2>
+    <p>Calls may be transcribed or summarized by our AI voice provider so the shop receives an accurate lead. Transcripts are stored with the lead record and shown in the workspace call log. Shops control whether the AI receptionist is enabled, which numbers forward to it, and can delete lead records from their workspace.</p>
+    <div class="note"><strong>Shop responsibility:</strong> if your jurisdiction requires a recording or monitoring disclosure, play or state that notice before forwarding calls. CallFlow answers only after your own line goes unanswered.</div>
+
+    <h2>5. Cookies and sessions</h2>
+    <ul>
+      <li><strong>cf_session</strong> — HttpOnly, SameSite=Lax session cookie that keeps a shop user signed in for up to 30 days. Required for the workspace.</li>
+      <li><strong>cf_admin</strong> — HttpOnly session cookie for the platform owner’s supervision dashboard, valid for up to 12 hours.</li>
+      <li>We do not use advertising or cross-site tracking cookies.</li>
+    </ul>
+    <p>Clearing cookies or using Log Out ends your session immediately. Session records are deleted or expired on the server.</p>
+
+    <h2>6. Data retention</h2>
+    <p>We keep business account records while the account is active, and lead/call records for as long as needed to provide the service and meet legal, tax and dispute obligations. Our current target retention period for lead and call-log data is <strong>[INSERT RETENTION PERIOD]</strong> (for example, 24 months from capture), after which records are deleted or anonymized. Sessions expire automatically. Webhook diagnostics are retained for a shorter operational window.</p>
+    <p>A shop may request earlier deletion of its leads or full account data by contacting us. Some records may be retained where law requires it (for example, billing records).</p>
+
+    <h2>7. When we share information</h2>
+    <p>We share only what is needed with service providers that operate the platform:</p>
+    <ul>
+      <li><strong>Telephony provider</strong> (for example Telnyx) to route calls and numbers.</li>
+      <li><strong>AI voice provider</strong> (for example Dograh) to answer calls and produce call summaries/transcripts.</li>
+      <li><strong>Dodo Payments</strong> to process subscriptions, invoices and payment status.</li>
+      <li><strong>Hosting and infrastructure providers</strong> that store the encrypted-at-rest database and serve the application.</li>
+    </ul>
+    <p>We do not sell personal information. We may disclose information if required by law, to protect our rights or safety, or as part of a business transfer with notice where required.</p>
+
+    <h2>8. Security</h2>
+    <p>Passwords are hashed with scrypt and unique salts, sessions use random opaque tokens in HttpOnly cookies, and administrative access is separately authenticated. Data is stored in a SQLite database with restricted server access. No method of transmission or storage is perfectly secure, so please use a strong unique password and tell us promptly about suspected unauthorized access.</p>
+
+    <h2>9. Your choices and rights</h2>
+    <p>Depending on where you live, you may have the right to access, correct, export or delete personal information, or to object to certain processing. Shop owners can update business details in the workspace and may contact us for other requests. Callers who want their lead information corrected or removed should contact the plumbing shop that received their call; we will assist the shop in fulfilling the request.</p>
+
+    <h2>10. Children</h2>
+    <p>CallFlow is a business service and is not directed to children under 16. We do not knowingly collect information from children.</p>
+
+    <h2>11. Changes to this policy</h2>
+    <p>We may update this policy as the service evolves. Material changes will be reflected by a new “Last updated” date, and significant changes will be communicated to active shops by email or in the workspace.</p>
+
+    <h2>12. Contact us</h2>
+    <p>Privacy questions, data requests or security reports:</p>
+    <ul>
+      <li>Email: <strong>[INSERT PRIVACY EMAIL]</strong></li>
+      <li>Support: <a href="/contact">Contact Us</a> or <strong>[INSERT SUPPORT EMAIL]</strong></li>
+      <li>Legal entity: <strong>[INSERT LEGAL ENTITY NAME]</strong>, <strong>[INSERT BUSINESS MAILING ADDRESS]</strong></li>
+    </ul>
+    <p>Response hours: Monday–Friday, 9:00am–6:00pm Central Time (excluding US holidays).</p>
+  </article>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <strong>CallFlow.biz</strong> · AI missed-call recovery for Austin plumbing crews
+    <nav class="foot-links" aria-label="Legal and support">
+      <a href="/privacy-policy">Privacy Policy</a>
+      <a href="/refund-and-cancellation">Refund and Cancellation</a>
+      <a href="/contact">Contact Us</a>
+      <a href="/">Home</a>
+    </nav>
+    <span class="legal-line">[INSERT LEGAL ENTITY NAME] · [INSERT BUSINESS MAILING ADDRESS] · [INSERT SUPPORT EMAIL]</span>
+  </div>
+</footer>
+</body>
+</html>

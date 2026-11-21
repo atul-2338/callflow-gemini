@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0D1B2A" />
+<title>Contact Us · CallFlow.biz</title>
+<meta name="description" content="Contact CallFlow support and sales for missed-call recovery, AI dispatch, billing questions and privacy requests." />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/legal.css" />
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap inner">
+    <a class="brand" href="/">
+      <span class="mark" aria-hidden="true">CF</span>
+      <span>
+        <strong>CallFlow.biz</strong>
+        <small>Missed-call recovery · Austin, TX</small>
+      </span>
+    </a>
+    <nav class="head-nav" aria-label="Site navigation">
+      <a href="/">Back to Home</a>
+      <a href="/app">Back to Dashboard</a>
+      <a class="is-primary" href="/contact">Contact Us</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="page-head">
+    <span class="kicker">Support</span>
+    <h1>Contact Us</h1>
+    <p class="lede">Questions about missed-call recovery, AI dispatch, billing or your CallFlow workspace? Send a message and a real person on the Austin team will reply.</p>
+    <div class="meta">
+      <span class="chip">Replies within 1 business day</span>
+      <span class="chip">Mon–Fri · 9am–6pm Central</span>
+    </div>
+  </section>
+
+  <article class="doc">
+    <span class="placeholder">Before launch: confirm <code>[INSERT SUPPORT EMAIL]</code>, <code>[INSERT SALES EMAIL]</code>, <code>[INSERT PHONE NUMBER]</code> and <code>[INSERT BUSINESS MAILING ADDRESS]</code>. The form below already posts to <code>POST /api/contact</code>.</span>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <span>Support</span>
+        <strong><a href="mailto:hello@callflow.biz">hello@callflow.biz</a></strong>
+        <small>Existing accounts, workspaces and call routing.</small>
+      </div>
+      <div class="contact-card">
+        <span>Sales &amp; demos</span>
+        <strong><a href="mailto:hello@callflow.biz?subject=CallFlow%20demo%20request">hello@callflow.biz</a></strong>
+        <small>New trials, Solo plan questions and onboarding.</small>
+      </div>
+      <div class="contact-card">
+        <span>Response hours</span>
+        <strong>Mon–Fri · 9am–6pm CT</strong>
+        <small>Closed weekends and US holidays. Urgent routing outages are prioritized.</small>
+      </div>
+    </div>
+
+    <h2>Send us a message</h2>
+    <form id="contactForm" novalidate>
+      <div class="form-grid two">
+        <div class="field">
+          <label for="contactName">Your name</label>
+          <input id="contactName" name="name" type="text" autocomplete="name" placeholder="Ramiro Garza" required />
+        </div>
+        <div class="field">
+          <label for="contactEmail">Work email</label>
+          <input id="contactEmail" name="email" type="email" autocomplete="email" placeholder="owner@yourbusiness.com" required />
+        </div>
+        <div class="field">
+          <label for="contactBusiness">Business name (optional)</label>
+          <input id="contactBusiness" name="business" type="text" autocomplete="organization" placeholder="South Congress Plumbing Co." />
+        </div>
+        <div class="field">
+          <label for="contactTopic">Topic</label>
+          <select id="contactTopic" name="topic">
+            <option value="Support">Workspace / call support</option>
+            <option value="Sales">Sales, trial or demo</option>
+            <option value="Billing">Billing or cancellation</option>
+            <option value="Privacy">Privacy or data request</option>
+            <option value="Other">Something else</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="contactMessage">How can we help?</label>
+        <textarea id="contactMessage" name="message" placeholder="Tell us what is happening, which business/number is affected, and the best time to reach you." required></textarea>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="contactWebsite">Website</label>
+        <input id="contactWebsite" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gold" id="contactSubmit" type="submit">Send message</button>
+        <a class="btn btn-ghost" href="mailto:hello@callflow.biz?subject=CallFlow%20support%20request">Email us directly</a>
+      </div>
+      <div class="form-status" id="contactStatus" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="note"><strong>Urgent?</strong> If calls are not reaching your AI receptionist right now, email <a href="mailto:hello@callflow.biz?subject=Urgent%20routing%20issue">hello@callflow.biz</a> with the affected number and mark it urgent. Do not include card numbers or passwords in any message.</div>
+
+    <h2>Other useful links</h2>
+    <ul>
+      <li><a href="/privacy-policy">Privacy Policy</a> — what data we process and how to make a privacy request.</li>
+      <li><a href="/refund-and-cancellation">Refund and Cancellation</a> — trial, Solo billing and cancellation terms.</li>
+      <li><a href="/app">Workspace dashboard</a> — manage your plan, number and call logs.</li>
+    </ul>
+  </article>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <strong>CallFlow.biz</strong> · AI missed-call recovery for Austin plumbing crews
+    <nav class="foot-links" aria-label="Legal and support">
+      <a href="/privacy-policy">Privacy Policy</a>
+      <a href="/refund-and-cancellation">Refund and Cancellation</a>
+      <a href="/contact">Contact Us</a>
+      <a href="/">Home</a>
+    </nav>
+    <span class="legal-line">[INSERT LEGAL ENTITY NAME] · [INSERT BUSINESS MAILING ADDRESS] · [INSERT SUPPORT EMAIL]</span>
+  </div>
+</footer>
+<script>
+  'use strict';
+  const form = document.getElementById('contactForm');
+  const statusEl = document.getElementById('contactStatus');
+  const submitBtn = document.getElementById('contactSubmit');
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text || '';
+    statusEl.className = 'form-status' + (kind ? ' ' + kind : '');
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const payload = {
+      name: document.getElementById('contactName').value.trim(),
+      email: document.getElementById('contactEmail').value.trim(),
+      business: document.getElementById('contactBusiness').value.trim(),
+      topic: document.getElementById('contactTopic').value,
+      message: document.getElementById('contactMessage').value.trim(),
+      website: document.getElementById('contactWebsite').value.trim(),
+    };
+    if (!payload.name) { setStatus('Please enter your name.', 'err'); document.getElementById('contactName').focus(); return; }
+    if (!payload.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      setStatus('Please enter a valid work email.', 'err');
+      document.getElementById('contactEmail').focus();
+      return;
+    }
+    if (payload.message.length < 10) {
+      setStatus('Add a few more details (at least 10 characters) so we can help.', 'err');
+      document.getElementById('contactMessage').focus();
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    setStatus('Sending your message…');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.ok === false) throw new Error(data.message || 'Could not send your message.');
+      setStatus((data.message || 'Thanks — your message is in. We reply within one business day.') + (data.reference ? ' Reference ' + data.reference + '.' : ''), 'ok');
+      form.reset();
+    } catch (err) {
+      setStatus((err && err.message) || 'Could not send your message. Please email hello@callflow.biz.', 'err');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send message';
+    }
+  });
+</script>
+</body>
+</html>

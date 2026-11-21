@@ -1,0 +1,45 @@
+# ---------------------------------------------------------------------------
+# CallFlow (callflow-gemini) — never commit secrets, data or build output
+# ---------------------------------------------------------------------------
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# SQLite database (live customer data lives here)
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Dependencies / build artefacts
+node_modules/
+dist_backup/
+dist/
+
+# Logs and run captures
+*.log
+logs/
+server.out.log
+server.err.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local scratch / agent temp files
+.tmp-*
+tmp/
+*.bak
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Unreferenced local media export (690 KB, not used by any page)
+Gemini_Generated_Image_*.jfif

@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0D1B2A" />
+<meta name="robots" content="noindex, nofollow" />
+<title>CallFlow Admin · Business Supervision</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-2: #122235;
+    --navy-3: #16283E;
+    --navy-4: #1B2E46;
+    --gold: #E2A93B;
+    --gold-2: #F3C96B;
+    --gold-soft: rgba(226, 169, 59, 0.14);
+    --line: rgba(148, 163, 184, 0.18);
+    --ok: #86EFAC;
+    --ok-bg: rgba(21, 128, 61, 0.18);
+    --danger: #FCA5A5;
+    --danger-bg: rgba(185, 28, 28, 0.2);
+    --warn: #FCD34D;
+    --warn-bg: rgba(180, 83, 9, 0.22);
+    --slate: #94A3B8;
+    --radius: 18px;
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--navy); color: #E8EEF6;
+    font-family: var(--font); font-size: 14px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, p { margin: 0; }
+  button { font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+  .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- top bar ---------- */
+  .topbar { position: sticky; top: 0; z-index: 20; background: rgba(13, 27, 42, 0.94);
+    border-bottom: 1px solid rgba(226, 169, 59, 0.28); backdrop-filter: blur(9px); }
+  .topbar-inner { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 13px; padding-bottom: 13px; }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--gold-2), var(--gold)); color: var(--navy);
+    font-weight: 900; font-size: 14px; letter-spacing: -0.02em; }
+  .brand strong { display: block; font-size: 13.5px; color: #fff; }
+  .brand small { display: block; font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 850; }
+  .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .admin-chip { font-size: 11px; color: #CBD5E1; border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 11px; background: rgba(255, 255, 255, 0.03); }
+  .admin-chip b { color: var(--gold-2); }
+
+  /* ---------- buttons ---------- */
+  .btn { appearance: none; border: 1px solid transparent; border-radius: 9px; padding: 8px 13px;
+    font-size: 11.5px; font-weight: 850; cursor: pointer; }
+  .btn-sm { padding: 7px 11px; font-size: 11px; }
+  .btn-gold { background: linear-gradient(150deg, var(--gold-2), var(--gold)); color: var(--navy); }
+  .btn-ghost { background: transparent; color: var(--gold); border-color: rgba(226, 169, 59, 0.5); }
+  .btn-ghost:hover { background: var(--gold-soft); }
+  .btn-disable { background: var(--danger-bg); color: var(--danger); border-color: rgba(252, 165, 165, 0.45); }
+  .btn-enable { background: var(--ok-bg); color: var(--ok); border-color: rgba(134, 239, 172, 0.45); }
+  .btn:disabled { opacity: 0.6; cursor: progress; }
+
+  /* ---------- page head ---------- */
+  .head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; padding: 26px 0 18px; }
+  .kicker { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 900; }
+  .head h1 { font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.03em; margin-top: 5px; }
+  .updated { font-size: 11px; color: var(--slate); font-variant-numeric: tabular-nums; }
+  .updated b { color: var(--gold-2); }
+
+  /* ---------- KPI cards ---------- */
+  .kpis { display: grid; gap: 12px; grid-template-columns: 1fr; padding-bottom: 18px; }
+  .kpi { position: relative; overflow: hidden; background: linear-gradient(165deg, var(--navy-3), var(--navy-2));
+    border: 1px solid var(--line); border-radius: 15px; padding: 15px 16px; }
+  .kpi::after { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.7; }
+  .kpi span { display: block; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); font-weight: 850; }
+  .kpi strong { display: block; margin-top: 6px; font-size: 27px; font-weight: 900; letter-spacing: -0.03em;
+    color: var(--gold); font-variant-numeric: tabular-nums; }
+  .kpi small { display: block; font-size: 10.5px; color: #CBD5E1; margin-top: 2px; }
+
+  /* ---------- panel / toolbar ---------- */
+  .panel { background: var(--navy-2); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: 0 30px 70px -46px rgba(0, 0, 0, 0.9); margin-bottom: 34px; overflow: hidden; }
+  .panel-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    padding: 15px 16px; border-bottom: 1px solid var(--line); }
+  .search input { width: min(340px, 68vw); padding: 9px 12px; border-radius: 9px; font: inherit; font-size: 12.5px;
+    background: rgba(8, 18, 30, 0.7); color: #F8FAFC; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .search input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.2); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { appearance: none; cursor: pointer; border-radius: 999px; padding: 6px 12px; font-size: 10.5px; font-weight: 850;
+    background: rgba(255, 255, 255, 0.04); color: #CBD5E1; border: 1px solid var(--line); }
+  .chip b { color: var(--gold); margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .chip.is-active { background: var(--gold-soft); border-color: rgba(226, 169, 59, 0.62); color: var(--gold-2); }
+
+  /* ---------- table ---------- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 1020px; }
+  thead th { background: var(--navy-3); text-align: left;
+    font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); font-weight: 900;
+    padding: 11px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 13px 14px; border-bottom: 1px solid rgba(148, 163, 184, 0.1); vertical-align: middle; font-size: 12.5px; }
+  tbody tr:hover { background: rgba(226, 169, 59, 0.045); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr.is-disabled { background: rgba(185, 28, 28, 0.055); }
+  .biz-name { font-weight: 850; color: #fff; }
+  .biz-mail { display: block; font-size: 11px; color: var(--slate); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; color: #E2E8F0; }
+  .muted { color: var(--slate); font-size: 11px; }
+  .type-pill { display: inline-block; font-size: 9.5px; font-weight: 900; letter-spacing: 0.06em;
+    text-transform: uppercase; border-radius: 999px; padding: 4px 9px; border: 1px solid var(--line); color: #CBD5E1; }
+  .type-pill.t-demo { color: #BFDBFE; border-color: rgba(147, 197, 253, 0.42); background: rgba(30, 64, 175, 0.22); }
+  .type-pill.t-trial { color: var(--gold-2); border-color: rgba(226, 169, 59, 0.55); background: var(--gold-soft); }
+  .type-pill.t-paid { color: var(--ok); border-color: rgba(134, 239, 172, 0.42); background: var(--ok-bg); }
+  .state { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 850; border-radius: 999px; padding: 4px 9px; }
+  .state.on { color: var(--ok); background: var(--ok-bg); }
+  .state.off { color: var(--danger); background: var(--danger-bg); }
+  .state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .min-badge { display: inline-block; font-size: 11px; font-weight: 900; border-radius: 7px; padding: 3px 8px;
+    font-variant-numeric: tabular-nums; background: rgba(255, 255, 255, 0.05); color: #E2E8F0; }
+  .min-badge.low { background: var(--warn-bg); color: var(--warn); }
+  .min-badge.zero { background: var(--danger-bg); color: var(--danger); }
+  .row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .empty { padding: 30px 18px; text-align: center; color: var(--slate); font-size: 12.5px; }
+  .toast { margin: 0; padding: 10px 16px; font-size: 12px; font-weight: 800; border-bottom: 1px solid var(--line);
+    color: var(--gold-2); background: var(--gold-soft); }
+  .toast.err { color: var(--danger); background: var(--danger-bg); }
+
+  /* ---------- section tabs ---------- */
+  .tabs { display: flex; gap: 5px; padding: 5px; width: fit-content; max-width: 100%;
+    border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, 0.03); margin-bottom: 18px; }
+  .tab { appearance: none; cursor: pointer; border: 1px solid transparent; border-radius: 9px;
+    background: transparent; color: #CBD5E1; font-size: 11.5px; font-weight: 850; padding: 8px 14px;
+    display: inline-flex; align-items: center; gap: 7px; }
+  .tab:hover { color: var(--gold-2); }
+  .tab.is-active { background: var(--gold-soft); border-color: rgba(226, 169, 59, 0.55); color: var(--gold-2); }
+  .tab-badge { font-size: 9.5px; font-weight: 900; border-radius: 999px; padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.08); color: #E2E8F0; }
+  .tab-badge.warn { background: var(--gold); color: var(--navy); }
+
+  /* ---------- Telnyx number pool ---------- */
+  .low-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 9.5px;
+    font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 999px;
+    padding: 3px 8px; background: var(--gold); color: var(--navy); }
+  .low-badge[hidden] { display: none; }
+  .pool-form { display: grid; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+  .pool-form .field label { display: block; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--slate); font-weight: 850; margin-bottom: 5px; }
+  .pool-form input, .pool-form textarea { width: 100%; padding: 9px 11px; border-radius: 9px; font: inherit;
+    font-size: 12.5px; background: rgba(8, 18, 30, 0.72); color: #F8FAFC;
+    border: 1px solid rgba(148, 163, 184, 0.3); resize: vertical; }
+  .pool-form textarea { min-height: 74px; }
+  .pool-form input:focus, .pool-form textarea:focus { outline: none; border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.2); }
+  .pool-form .hint { font-size: 10.5px; color: var(--slate); margin-top: 5px; }
+  .pool-form .actions { display: flex; align-items: flex-end; }
+  @media (min-width: 900px) {
+    .pool-form { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; }
+  }
+  .pool-table { min-width: 900px; }
+  .pill { display: inline-block; font-size: 9.5px; font-weight: 900; letter-spacing: 0.06em;
+    text-transform: uppercase; border-radius: 999px; padding: 4px 9px; border: 1px solid var(--line); }
+  .pill.p-available { color: var(--ok); border-color: rgba(134, 239, 172, 0.45); background: var(--ok-bg); }
+  .pill.p-assigned { color: #BFDBFE; border-color: rgba(147, 197, 253, 0.45); background: rgba(30, 64, 175, 0.24); }
+  .pill.p-disabled { color: var(--slate); border-color: var(--line); background: rgba(148, 163, 184, 0.12); }
+  .pool-note { display: block; font-size: 10.5px; color: var(--slate); margin-top: 2px; }
+  .pool-business { font-weight: 800; color: #E2E8F0; }
+  .pool-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  /* ---------- call log ---------- */
+  .call-table { min-width: 880px; }
+  .call-filter { padding: 8px 10px; border-radius: 9px; font: inherit; font-size: 12px;
+    background: rgba(8, 18, 30, 0.72); color: #F8FAFC; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .call-filter:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.2); }
+  .cell-stack { display: flex; flex-direction: column; gap: 2px; }
+  .call-when { font-variant-numeric: tabular-nums; }
+  .call-when b { color: #F8FAFC; font-weight: 800; }
+  .call-when span { display: block; font-size: 10.5px; color: var(--slate); }
+  .call-duration { font-weight: 800; color: #F8FAFC; font-variant-numeric: tabular-nums; }
+  .call-duration span { display: block; font-size: 10.5px; color: var(--slate); font-weight: 500; }
+
+  /* ---------- dialog ---------- */
+  dialog { width: min(400px, 92vw); border-radius: 16px; border: 1px solid rgba(226, 169, 59, 0.5);
+    background: var(--navy-2); color: #E8EEF6; padding: 20px; box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.95); }
+  dialog::backdrop { background: rgba(5, 13, 24, 0.72); backdrop-filter: blur(3px); }
+  dialog h3 { font-size: 15px; color: #fff; }
+  dialog p { font-size: 11.5px; color: var(--slate); margin-top: 4px; }
+  .dlg-field { margin-top: 13px; }
+  .dlg-field label { display: block; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--slate); font-weight: 850; margin-bottom: 5px; }
+  .dlg-field input { width: 100%; padding: 9px 11px; border-radius: 9px; font: inherit; font-size: 13px;
+    background: rgba(8, 18, 30, 0.72); color: #F8FAFC; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .dlg-field input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.2); }
+  .dlg-field select { width: 100%; padding: 9px 11px; border-radius: 9px; font: inherit; font-size: 13px;
+    background: rgba(8, 18, 30, 0.72); color: #F8FAFC; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .dlg-field select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.2); }
+  .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+  @media (min-width: 700px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">CF</span>
+      <span>
+        <strong>CallFlow.biz</strong>
+        <small>Super Admin</small>
+      </span>
+    </div>
+    <div class="topbar-actions">
+      <span class="admin-chip">Signed in as <b id="adminEmail">—</b></span>
+      <button class="btn btn-ghost btn-sm" id="refreshBtn" type="button">Refresh</button>
+      <button class="btn btn-gold btn-sm" id="logoutBtn" type="button">Log Out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="head">
+    <div>
+      <span class="kicker">Platform supervision</span>
+      <h1 id="pageTitle">Business accounts</h1>
+    </div>
+    <div class="updated">Updated <b id="lastUpdated">—</b></div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Admin sections">
+    <button class="tab is-active" type="button" role="tab" aria-selected="true" data-view="businesses">Businesses</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-view="pool">
+      Telnyx Number Pool <span class="tab-badge" id="poolTabBadge">0</span>
+    </button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-view="calls">Call log</button>
+  </nav>
+
+  <div data-view-panel="businesses">
+  <section class="kpis" aria-label="Platform KPIs">
+    <article class="kpi">
+      <span>Total businesses</span>
+      <strong id="kpiTotal">—</strong>
+      <small>Demo, trial and paid accounts</small>
+    </article>
+    <article class="kpi">
+      <span>Active trial / demo</span>
+      <strong id="kpiTrial">—</strong>
+      <small>Enabled evaluation accounts</small>
+    </article>
+    <article class="kpi">
+      <span>Active paid (Solo)</span>
+      <strong id="kpiPaid">—</strong>
+      <small>Enabled Solo subscriptions</small>
+    </article>
+    <article class="kpi">
+      <span>Total minutes remaining</span>
+      <strong id="kpiMinutes">—</strong>
+      <small>Across every account</small>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Search business, owner email or phone number" aria-label="Search accounts" />
+      </div>
+      <div class="chips" id="filterChips" role="group" aria-label="Filter accounts">
+        <button class="chip is-active" type="button" data-filter="all">All <b id="count-all">0</b></button>
+        <button class="chip" type="button" data-filter="trial">Trial &amp; Demo <b id="count-trial">0</b></button>
+        <button class="chip" type="button" data-filter="paid">Paid <b id="count-paid">0</b></button>
+        <button class="chip" type="button" data-filter="disabled">Disabled <b id="count-disabled">0</b></button>
+      </div>
+    </div>
+    <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Business &amp; owner email</th>
+            <th scope="col">Assigned number</th>
+            <th scope="col">Account type</th>
+            <th scope="col">Trial expiry / billing</th>
+            <th scope="col">Leads today</th>
+            <th scope="col">Minutes left</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody id="accountsBody">
+          <tr><td colspan="8" class="empty">Loading accounts…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="empty" id="emptyState" hidden>No businesses match that filter or search.</p>
+  </section>
+  </div>
+
+  <div data-view-panel="pool" hidden>
+    <section class="kpis pool-kpis" aria-label="Number pool KPIs">
+      <article class="kpi">
+        <span>Available numbers</span>
+        <strong id="poolKpiAvailable">—</strong>
+        <small>Ready for instant assignment</small>
+        <span class="low-badge" id="poolLowBadge" hidden>Low inventory</span>
+      </article>
+      <article class="kpi">
+        <span>Assigned numbers</span>
+        <strong id="poolKpiAssigned">—</strong>
+        <small>Forwarding on live businesses</small>
+      </article>
+      <article class="kpi">
+        <span>Total pool size</span>
+        <strong id="poolKpiTotal">—</strong>
+        <small>Purchased Telnyx inventory</small>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <span class="kicker">Inventory</span>
+          <h2 style="font-size:15px;color:#fff;margin-top:4px">Add Telnyx numbers</h2>
+        </div>
+        <span class="muted" id="poolCounts">—</span>
+      </div>
+      <form id="poolAddForm" class="pool-form" autocomplete="off">
+        <div class="field">
+          <label for="poolNumbers">Telnyx number(s)</label>
+          <textarea id="poolNumbers" placeholder="+15125550194&#10;+15125550195, +15125550196"></textarea>
+          <p class="hint">One number per line or comma-separated. Normalized to E.164, duplicates skipped.</p>
+        </div>
+        <div class="field">
+          <label for="poolLabel">Friendly label</label>
+          <input id="poolLabel" type="text" placeholder="Austin 512 Line 1" />
+        </div>
+        <div class="field">
+          <label for="poolNotes">Notes</label>
+          <input id="poolNotes" type="text" placeholder="Telnyx order reference" />
+        </div>
+        <div class="actions">
+          <button class="btn btn-gold" id="poolAddBtn" type="submit">Add to Pool</button>
+        </div>
+      </form>
+      <div class="panel-head">
+        <div>
+          <span class="kicker">Pool inventory</span>
+          <h2 style="font-size:15px;color:#fff;margin-top:4px">Telnyx numbers</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="pool-table">
+          <thead>
+            <tr>
+              <th scope="col">Phone number</th>
+              <th scope="col">Area / label</th>
+              <th scope="col">Status</th>
+              <th scope="col">Assigned business</th>
+              <th scope="col">AI target</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="poolBody">
+            <tr><td colspan="6" class="empty">Loading number pool…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div data-view-panel="calls" hidden>
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <span class="kicker">Call log</span>
+          <h2 style="font-size:15px;color:#fff;margin-top:4px">Recent calls across every business</h2>
+        </div>
+        <div class="row" style="gap:8px;align-items:center">
+          <select class="call-filter" id="callLogBusiness" aria-label="Filter call log by business">
+            <option value="">All businesses</option>
+          </select>
+          <button class="btn btn-sm btn-ghost" id="callLogRefresh" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="call-table">
+          <thead>
+            <tr>
+              <th scope="col">Date &amp; time</th>
+              <th scope="col">Business / number</th>
+              <th scope="col">Caller</th>
+              <th scope="col">Call duration</th>
+              <th scope="col">Status / outcome</th>
+            </tr>
+          </thead>
+          <tbody id="callLogBody">
+            <tr><td colspan="5" class="empty">Loading call log…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" id="callLogMeta" style="padding:10px 16px">—</p>
+    </section>
+  </div>
+</main>
+
+<dialog id="minutesDialog" aria-labelledby="minutesDialogTitle">
+  <form method="dialog" id="minutesForm">
+    <h3 id="minutesDialogTitle">Top up minutes</h3>
+    <p id="minutesDialogSub">Adjust included AI call minutes for this business.</p>
+    <div class="dlg-field">
+      <label for="minutesAdd">Add minutes</label>
+      <input id="minutesAdd" type="number" min="0" step="10" placeholder="e.g. 100" />
+    </div>
+    <div class="dlg-field">
+      <label for="minutesSet">Or set included minutes</label>
+      <input id="minutesSet" type="number" min="0" step="10" placeholder="e.g. 300" />
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn-ghost" type="button" id="minutesCancel">Cancel</button>
+      <button class="btn btn-gold" type="submit" id="minutesSave">Save minutes</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="assignDialog" aria-labelledby="assignDialogTitle">
+  <form method="dialog" id="assignForm">
+    <h3 id="assignDialogTitle">Assign pool number</h3>
+    <p id="assignDialogSub">Choose the business that should forward calls on this number.</p>
+    <div class="dlg-field">
+      <label for="assignBusiness">Business</label>
+      <select id="assignBusiness"></select>
+    </div>
+    <div class="dlg-field">
+      <label for="assignForwarding">AI agent target (optional)</label>
+      <input id="assignForwarding" type="tel" placeholder="+17374021999" autocomplete="off" />
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn-ghost" type="button" id="assignCancel">Cancel</button>
+      <button class="btn btn-gold" type="submit" id="assignSave">Assign number</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="forwardDialog" aria-labelledby="forwardDialogTitle">
+  <form method="dialog" id="forwardForm">
+    <h3 id="forwardDialogTitle">AI agent / forwarding target</h3>
+    <p id="forwardDialogSub">This Telnyx number forwards to the Dograh agent line. Leave it empty to clear the mapping.</p>
+    <div class="dlg-field">
+      <label for="forwardTarget">Forwarding target (E.164)</label>
+      <input id="forwardTarget" type="tel" placeholder="+17374021999" autocomplete="off" />
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn-ghost" type="button" id="forwardCancel">Cancel</button>
+      <button class="btn btn-gold" type="submit" id="forwardSave">Save target</button>
+    </div>
+  </form>
+</dialog>
+<script>
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    view: 'businesses',
+    filter: 'all',
+    search: '',
+    accounts: [],
+    businesses: [],
+    pool: { numbers: [], counts: {} },
+    summary: null,
+    activeBusiness: null,
+    activePool: null,
+  };
+
+  const VIEW_COPY = {
+    businesses: { title: 'Business accounts' },
+    pool: { title: 'Telnyx number pool' },
+    calls: { title: 'Call log' },
+  };
+
+  const esc = (value) => String(value === undefined || value === null ? '' : value)
+    .replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const num = (value) => Number(value) || 0;
+
+  let toastTimer = null;
+  function showToast(text, kind) {
+    const el = $('toast');
+    if (!el) return;
+    el.textContent = text || '';
+    el.className = 'toast' + (kind === 'err' ? ' err' : '');
+    el.hidden = !text;
+    if (toastTimer) clearTimeout(toastTimer);
+    if (text) toastTimer = setTimeout(() => { el.hidden = true; }, 6000);
+  }
+
+  async function api(path, options = {}) {
+    const res = await fetch(path, {
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+      window.location.assign('/admin');
+      throw new Error('admin_auth_required');
+    }
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || 'Request failed');
+    }
+    return data;
+  }
+
+  function fmtDate(value) {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function typeClass(account) {
+    if (account.plan_type === 'demo') return 't-demo';
+    if (account.plan_type === 'solo' || account.plan_type === 'paid' || account.subscription_status === 'active') return 't-paid';
+    return 't-trial';
+  }
+
+  function billingCell(account) {
+    if (account.plan_type === 'demo') {
+      return '<span class="type-pill t-demo">Demo workspace</span><span class="biz-mail">No live billing</span>';
+    }
+    if (account.plan_type === 'solo' || account.plan_type === 'paid' || account.subscription_status === 'active') {
+      const status = String(account.subscription_status || 'active').replace(/_/g, ' ');
+      return '<span class="state ' + (account.subscription_status === 'active' ? 'on' : 'off') + '">' + esc(status) + '</span>'
+        + '<span class="biz-mail">' + (account.current_period_end ? 'Renews ' + esc(fmtDate(account.current_period_end)) : 'No renewal date') + '</span>';
+    }
+    const days = account.trial_days_left;
+    const expired = account.trial_expired || num(days) <= 0;
+    const label = expired ? 'Trial expired' : 'Trial ends ' + fmtDate(account.trial_ends_at);
+    const suffix = expired ? 'Upgrade to Solo' : num(days) + ' day' + (num(days) === 1 ? '' : 's') + ' left';
+    return '<span class="state ' + (expired ? 'off' : 'on') + '">' + esc(label) + '</span><span class="biz-mail">' + esc(suffix) + '</span>';
+  }
+
+  function leadsCell(account) {
+    if (account.daily_lead_limit) {
+      return '<b>' + num(account.leads_today) + ' / ' + num(account.daily_lead_limit) + '</b><span class="biz-mail">trial daily cap</span>';
+    }
+    return '<b>' + num(account.leads_today) + '</b><span class="biz-mail">no daily cap</span>';
+  }
+
+  function minutesCell(account) {
+    const left = Math.max(0, num(account.minutes_left));
+    const cls = left === 0 ? ' zero' : left <= 5 ? ' low' : '';
+    return '<span class="min-badge' + cls + '">' + left + ' min left</span>'
+      + '<span class="biz-mail">' + num(account.minutes_used) + ' used of ' + num(account.minutes_included) + '</span>';
+  }
+
+  function rowHtml(account) {
+    const enabled = num(account.is_enabled) === 1;
+    const owner = account.owner_email || account.contact_email || 'no owner email';
+    return '<tr class="' + (enabled ? '' : 'is-disabled') + '" data-id="' + esc(account.id) + '">'
+      + '<td><span class="biz-name">' + esc(account.business_name) + '</span><span class="biz-mail">' + esc(owner) + '</span>'
+      + (account.owner_name ? '<span class="biz-mail">' + esc(account.owner_name) + '</span>' : '') + '</td>'
+      + '<td>' + numberCell(account) + '</td>'
+      + '<td><span class="type-pill ' + typeClass(account) + '">' + esc(account.account_type) + '</span></td>'
+      + '<td>' + billingCell(account) + '</td>'
+      + '<td>' + leadsCell(account) + '</td>'
+      + '<td>' + minutesCell(account) + '</td>'
+      + '<td><span class="state ' + (enabled ? 'on' : 'off') + '">' + (enabled ? 'Enabled' : 'Disabled') + '</span></td>'
+      + '<td><div class="row-actions">'
+      + '<button class="btn btn-sm ' + (enabled ? 'btn-disable' : 'btn-enable') + '" type="button" data-toggle="' + esc(account.id) + '" data-enabled="' + (enabled ? '1' : '0') + '">'
+      + (enabled ? 'Disable' : 'Enable') + '</button>'
+      + '<button class="btn btn-sm btn-ghost" type="button" data-minutes="' + esc(account.id) + '">Top up</button>'
+      + '</div></td></tr>';
+  }
+
+  // Assigned number cell: shows the live forwarding number plus the pool number
+  // it came from, with a quick release / assign action.
+  function numberCell(account) {
+    const parts = [];
+    parts.push(account.phone_number
+      ? '<span class="mono">' + esc(account.phone_number) + '</span>'
+      : '<span class="muted">No forwarding number</span>');
+    if (account.forwarding_target) {
+      parts.push('<span class="biz-mail">AI target ' + esc(account.forwarding_target) + '</span>');
+    }
+    if (account.pool_number_id) {
+      parts.push('<span class="biz-mail">Pool #' + esc(account.pool_number_id)
+        + (account.pool_label ? ' · ' + esc(account.pool_label) : '') + '</span>');
+      parts.push('<span class="pool-actions" style="margin-top:5px">'
+        + '<button class="btn btn-sm btn-disable" type="button" data-biz-pool-release="' + esc(account.pool_number_id) + '">Release</button>'
+        + '</span>');
+    } else {
+      parts.push('<span class="biz-mail">No pool number</span>');
+      parts.push('<span class="pool-actions" style="margin-top:5px">'
+        + '<button class="btn btn-sm btn-ghost" type="button" data-biz-pool-assign="' + esc(account.id) + '">Assign pool #</button>'
+        + '</span>');
+    }
+    return parts.join('');
+  }
+
+  function render() {
+    const body = $('accountsBody');
+    const accounts = state.accounts || [];
+    body.innerHTML = accounts.length
+      ? accounts.map(rowHtml).join('')
+      : '<tr><td colspan="8" class="empty">No businesses match that filter or search.</td></tr>';
+    $('emptyState').hidden = true;
+  }
+
+  /* ---------------- section tabs ---------------- */
+  function switchView(view) {
+    const target = ['pool', 'calls'].includes(view) ? view : 'businesses';
+    state.view = target;
+    document.querySelectorAll('.tabs [data-view]').forEach((tab) => {
+      const active = tab.dataset.view === target;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('[data-view-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.viewPanel !== target;
+    });
+    const copy = VIEW_COPY[target];
+    $('pageTitle').textContent = copy.title;
+    if (target === 'calls') {
+      paintCallBusinessFilter();
+      loadCalls();
+    }
+  }
+
+  /* ---------------- Telnyx number pool ---------------- */
+  function paintPool(pool) {
+    const counts = (pool && pool.counts) || {};
+    const available = num(counts.available);
+    $('poolKpiAvailable').textContent = available;
+    $('poolKpiAssigned').textContent = num(counts.assigned);
+    $('poolKpiTotal').textContent = num(counts.total);
+    $('poolCounts').textContent = num(counts.total) + ' total · ' + num(counts.disabled) + ' disabled';
+
+    const low = available <= 2;
+    const lowBadge = $('poolLowBadge');
+    lowBadge.hidden = !low;
+    lowBadge.textContent = available === 0 ? 'Pool empty' : 'Low inventory';
+    const tabBadge = $('poolTabBadge');
+    tabBadge.textContent = String(available);
+    tabBadge.classList.toggle('warn', low);
+    tabBadge.title = low ? 'Low inventory — add Telnyx numbers' : 'Available numbers';
+  }
+
+  function poolRowHtml(number) {
+    const actions = [];
+    if (number.status === 'available') {
+      actions.push('<button class="btn btn-sm btn-gold" type="button" data-pool-assign="' + number.id + '">Assign</button>');
+      actions.push('<button class="btn btn-sm btn-ghost" type="button" data-pool-toggle="' + number.id + '">Disable</button>');
+      actions.push('<button class="btn btn-sm btn-disable" type="button" data-pool-delete="' + number.id + '">Delete</button>');
+    } else if (number.status === 'assigned') {
+      actions.push('<button class="btn btn-sm btn-ghost" type="button" data-pool-forward="' + number.id + '">AI target</button>');
+      actions.push('<button class="btn btn-sm btn-disable" type="button" data-pool-release="' + number.id + '">Release</button>');
+    } else {
+      actions.push('<button class="btn btn-sm btn-enable" type="button" data-pool-toggle="' + number.id + '">Enable</button>');
+      actions.push('<button class="btn btn-sm btn-disable" type="button" data-pool-delete="' + number.id + '">Delete</button>');
+    }
+    const areaLabel = [number.area_code ? 'Area ' + number.area_code : null, number.friendly_label].filter(Boolean).join(' · ');
+    return '<tr data-pool-id="' + number.id + '">'
+      + '<td><span class="mono" style="font-size:12.5px">' + esc(number.display_number || number.phone_number) + '</span>'
+      + (number.notes ? '<span class="pool-note">' + esc(number.notes) + '</span>' : '') + '</td>'
+      + '<td>' + (areaLabel ? esc(areaLabel) : '<span class="muted">—</span>') + '</td>'
+      + '<td><span class="pill p-' + esc(number.status) + '">' + esc(number.status) + '</span></td>'
+      + '<td>' + (number.assigned_business_name
+        ? '<span class="pool-business">' + esc(number.assigned_business_name) + '</span>'
+          + (number.assigned_business_email ? '<span class="pool-note">' + esc(number.assigned_business_email) + '</span>' : '')
+        : '<span class="muted">Unassigned</span>') + '</td>'
+      + '<td>' + (number.forwarding_target
+        ? '<span class="mono" style="font-size:12px">' + esc(number.forwarding_target) + '</span><span class="pool-note">Dograh agent line</span>'
+        : '<span class="muted">—</span>') + '</td>'
+      + '<td><div class="pool-actions">' + actions.join('') + '</div></td></tr>';
+  }
+
+  function renderPool() {
+    const numbers = (state.pool && state.pool.numbers) || [];
+    $('poolBody').innerHTML = numbers.length
+      ? numbers.map(poolRowHtml).join('')
+      : '<tr><td colspan="6" class="empty">Pool is empty — add purchased Telnyx numbers above.</td></tr>';
+  }
+
+  async function loadPool() {
+    try {
+      const [pool, businesses] = await Promise.all([
+        api('/api/admin/number-pool'),
+        api('/api/admin/businesses?filter=all'),
+      ]);
+      state.pool = { numbers: pool.numbers || [], counts: pool.counts || {} };
+      state.businesses = businesses.accounts || [];
+      paintPool(state.pool);
+      renderPool();
+      paintCallBusinessFilter();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not load the number pool.', 'err');
+    }
+  }
+
+  /* ---------------- call log ---------------- */
+  function fmtDateTime(iso) {
+    const ms = Date.parse(iso);
+    if (!Number.isFinite(ms)) return '—';
+    return new Date(ms).toLocaleString(undefined, {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
+    });
+  }
+  function fmtUtcTime(iso) {
+    const ms = Date.parse(iso);
+    if (!Number.isFinite(ms)) return 'UTC —';
+    const d = new Date(ms);
+    return 'UTC ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0');
+  }
+  function fmtDuration(seconds) {
+    const total = Math.max(0, Math.round(Number(seconds) || 0));
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return mins ? mins + 'm ' + String(secs).padStart(2, '0') + 's' : secs + 's';
+  }
+
+  function callRowHtml(call) {
+    const status = String(call.status || 'new');
+    const pill = status === 'booked' ? 'available' : (status === 'closed_lost' ? 'disabled' : 'assigned');
+    const urg = String(call.urgency || 'unknown');
+    return '<tr>'
+      + '<td><div class="call-when"><b>' + esc(fmtDateTime(call.occurred_at)) + '</b>'
+      + '<span>' + esc(fmtUtcTime(call.occurred_at)) + (call.call_started_at ? '' : ' · logged at receipt') + '</span></div></td>'
+      + '<td><div class="cell-stack"><span class="pool-business">' + esc(call.business_name || 'Unknown business') + '</span>'
+      + '<span class="pool-note">' + esc(call.number || 'no number assigned') + '</span></div></td>'
+      + '<td><div class="cell-stack"><span class="mono">' + esc(call.caller_phone || 'Unknown caller') + '</span>'
+      + (call.caller_name ? '<span class="pool-note">' + esc(call.caller_name) + '</span>' : '') + '</div></td>'
+      + '<td><div class="call-duration">' + esc(fmtDuration(call.duration_seconds)) + '<span>' + esc(String(call.duration_seconds || 0) + 's talk time') + '</span></div></td>'
+      + '<td><div class="cell-stack"><span class="pill p-' + esc(pill) + '">' + esc(call.status_label || status) + '</span>'
+      + '<span class="pool-note">' + esc(urg) + (call.issue_summary ? ' · ' + esc(String(call.issue_summary).slice(0, 60)) : '') + '</span></div></td>'
+      + '</tr>';
+  }
+
+  function paintCalls(data) {
+    const calls = (data && data.calls) || [];
+    state.calls = calls;
+    $('callLogBody').innerHTML = calls.length
+      ? calls.map(callRowHtml).join('')
+      : '<tr><td colspan="5" class="empty">No calls captured yet — new Dograh webhook deliveries appear here.</td></tr>';
+    const totals = (data && data.totals) || {};
+    const scope = $('callLogBusiness').value ? 'one business' : 'all businesses';
+    $('callLogMeta').textContent = num(calls.length) + ' calls · '
+      + (totals.talk_label || fmtDuration(totals.talk_seconds || 0)) + ' total talk time · ' + scope;
+  }
+
+  function paintCallBusinessFilter() {
+    const select = $('callLogBusiness');
+    if (!select) return;
+    const current = select.value;
+    const businesses = state.businesses.length ? state.businesses : state.accounts;
+    select.innerHTML = '<option value="">All businesses</option>'
+      + businesses.map((business) => '<option value="' + esc(business.id) + '">' + esc(business.business_name) + '</option>').join('');
+    select.value = businesses.some((business) => business.id === current) ? current : '';
+  }
+
+  async function loadCalls() {
+    const params = new URLSearchParams({ limit: '100' });
+    const businessId = $('callLogBusiness').value;
+    if (businessId) params.set('business_id', businessId);
+    try {
+      const data = await api('/api/admin/calls?' + params.toString());
+      paintCalls(data);
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not load the call log.', 'err');
+    }
+  }
+
+  async function refreshAll() {
+    await Promise.all([load(), loadPool()]);
+    if (state.view === 'calls') await loadCalls();
+    $('lastUpdated').textContent = new Date().toLocaleTimeString();
+  }
+
+  async function submitPoolNumbers(event) {
+    event.preventDefault();
+    const raw = $('poolNumbers').value.trim();
+    if (!raw) { showToast('Paste at least one Telnyx number.', 'err'); return; }
+    const button = $('poolAddBtn');
+    button.disabled = true;
+    button.textContent = 'Adding…';
+    try {
+      const result = await api('/api/admin/number-pool', {
+        method: 'POST',
+        body: JSON.stringify({
+          numbers: raw,
+          friendly_label: $('poolLabel').value.trim() || null,
+          notes: $('poolNotes').value.trim() || null,
+        }),
+      });
+      const skipped = (result.skipped || []).length;
+      showToast((result.message || 'Numbers added to the pool.') + (skipped ? ` ${skipped} skipped (duplicate or invalid).` : ''));
+      $('poolNumbers').value = '';
+      $('poolLabel').value = '';
+      $('poolNotes').value = '';
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not add those numbers.', 'err');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Add to Pool';
+    }
+  }
+
+  function openAssignDialog(poolId) {
+    const number = ((state.pool && state.pool.numbers) || []).find((item) => item.id === Number(poolId));
+    if (!number) { showToast('That pool number is no longer available.', 'err'); return; }
+    state.activePool = number;
+    $('assignDialogSub').textContent = (number.display_number || number.phone_number)
+      + ' · ' + (number.friendly_label || ('Area ' + (number.area_code || '—')));
+    const select = $('assignBusiness');
+    const businesses = state.businesses.length ? state.businesses : state.accounts;
+    select.innerHTML = businesses.length
+      ? businesses.map((business) => '<option value="' + esc(business.id) + '">'
+        + esc(business.business_name) + (business.owner_email ? ' · ' + esc(business.owner_email) : '') + '</option>').join('')
+      : '<option value="">No businesses yet</option>';
+    $('assignForwarding').value = number.forwarding_target || '';
+    const dialog = $('assignDialog');
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+  }
+
+  async function submitAssign(event) {
+    event.preventDefault();
+    const number = state.activePool;
+    const businessId = $('assignBusiness').value;
+    if (!number) return;
+    if (!businessId) { showToast('Pick a business first.', 'err'); return; }
+    const save = $('assignSave');
+    save.disabled = true;
+    save.textContent = 'Assigning…';
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(number.id) + '/assign', {
+        method: 'POST',
+        body: JSON.stringify({ business_id: businessId, forwarding_target: $('assignForwarding').value.trim() || null }),
+      });
+      $('assignDialog').close();
+      showToast(result.message || 'Number assigned.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not assign that number.', 'err');
+    } finally {
+      save.disabled = false;
+      save.textContent = 'Assign number';
+    }
+  }
+
+  // Optional per-number AI agent line: the DID forwards to this number in
+  // Telnyx, so Dograh reports it as `to_number` and the webhook resolves the
+  // tenant from the configured target.
+  function openForwardDialog(poolId) {
+    const number = ((state.pool && state.pool.numbers) || []).find((item) => item.id === Number(poolId));
+    if (!number) { showToast('That pool number is no longer available.', 'err'); return; }
+    state.activePool = number;
+    $('forwardDialogSub').textContent = (number.display_number || number.phone_number)
+      + ' · ' + (number.assigned_business_name || 'Unassigned');
+    $('forwardTarget').value = number.forwarding_target || '';
+    const dialog = $('forwardDialog');
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+  }
+
+  async function submitForward(event) {
+    event.preventDefault();
+    const number = state.activePool;
+    if (!number) return;
+    const target = $('forwardTarget').value.trim();
+    const save = $('forwardSave');
+    save.disabled = true;
+    save.textContent = 'Saving…';
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(number.id) + '/forwarding-target', {
+        method: 'POST',
+        body: JSON.stringify({ forwarding_target: target || null }),
+      });
+      $('forwardDialog').close();
+      showToast(result.message || 'Forwarding target saved.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not save that forwarding target.', 'err');
+    } finally {
+      save.disabled = false;
+      save.textContent = 'Save target';
+    }
+  }
+
+  async function releasePoolNumber(poolId, button) {
+    if (!window.confirm('Release this number back to the available pool? The business keeps working but will have no forwarding number until another is assigned.')) return;
+    if (button) { button.disabled = true; button.textContent = 'Releasing…'; }
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(poolId) + '/release', {
+        method: 'POST',
+        body: '{}',
+      });
+      showToast(result.message || 'Number released.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not release that number.', 'err');
+      if (button) { button.disabled = false; button.textContent = 'Release'; }
+    }
+  }
+
+  async function togglePoolNumber(poolId, button) {
+    const disabling = button && button.textContent.trim() === 'Disable';
+    if (button) { button.disabled = true; button.textContent = disabling ? 'Disabling…' : 'Enabling…'; }
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(poolId) + '/toggle', {
+        method: 'POST',
+        body: '{}',
+      });
+      showToast(result.message || 'Number updated.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not update that number.', 'err');
+      if (button) { button.disabled = false; button.textContent = disabling ? 'Disable' : 'Enable'; }
+    }
+  }
+
+  async function deletePoolNumber(poolId, button) {
+    if (!window.confirm('Delete this number from the pool? This cannot be undone.')) return;
+    if (button) { button.disabled = true; button.textContent = 'Deleting…'; }
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(poolId), { method: 'DELETE' });
+      showToast(result.message || 'Number deleted.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not delete that number.', 'err');
+      if (button) { button.disabled = false; button.textContent = 'Delete'; }
+    }
+  }
+
+  // Quick assign from the businesses table: claims the first available number.
+  async function quickAssignBusiness(businessId, button) {
+    const available = ((state.pool && state.pool.numbers) || []).filter((number) => number.status === 'available');
+    if (!available.length) {
+      showToast('No available numbers — add inventory in the Telnyx Number Pool tab.', 'err');
+      return;
+    }
+    const number = available[0];
+    if (!window.confirm(`Assign ${number.display_number || number.phone_number} to this business?`)) return;
+    if (button) { button.disabled = true; button.textContent = 'Assigning…'; }
+    try {
+      const result = await api('/api/admin/number-pool/' + encodeURIComponent(number.id) + '/assign', {
+        method: 'POST',
+        body: JSON.stringify({ business_id: businessId }),
+      });
+      showToast(result.message || 'Number assigned.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not assign a number.', 'err');
+      if (button) { button.disabled = false; button.textContent = 'Assign pool #'; }
+    }
+  }
+
+  function paintSummary(summary) {
+    state.summary = summary;
+    const kpis = summary.kpis || {};
+    $('kpiTotal').textContent = num(kpis.total_businesses);
+    $('kpiTrial').textContent = num(kpis.trial_demo_accounts);
+    $('kpiPaid').textContent = num(kpis.paid_accounts);
+    $('kpiMinutes').textContent = num(kpis.total_minutes_remaining).toLocaleString('en-US') + ' min';
+    const counts = summary.counts || {};
+    ['all', 'trial', 'paid', 'disabled'].forEach((key) => {
+      const el = $('count-' + key);
+      if (el) el.textContent = String(num(counts[key]));
+    });
+    if (summary.admin && summary.admin.email) $('adminEmail').textContent = summary.admin.email;
+    $('lastUpdated').textContent = new Date(summary.generated_at || Date.now()).toLocaleTimeString();
+  }
+
+  async function load() {
+    try {
+      const query = new URLSearchParams({ filter: state.filter, search: state.search });
+      const summary = await api('/api/admin/summary?' + query.toString());
+      state.accounts = summary.accounts || [];
+      paintSummary(summary);
+      render();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not load accounts.', 'err');
+    }
+  }
+
+  async function toggleBusiness(id, enabled, button) {
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = enabled ? 'Disabling…' : 'Enabling…';
+    try {
+      const result = await api('/api/admin/businesses/' + encodeURIComponent(id) + '/toggle', {
+        method: 'POST',
+        body: JSON.stringify({ enabled: !enabled }),
+      });
+      showToast(result.message || 'Business updated.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not update that business.', 'err');
+      button.disabled = false;
+      button.textContent = original;
+    }
+  }
+
+  function openMinutesDialog(account) {
+    state.activeBusiness = account;
+    $('minutesDialogSub').textContent = account.business_name + ' · ' + num(account.minutes_left) + ' min left of ' + num(account.minutes_included) + '.';
+    $('minutesAdd').value = '';
+    $('minutesSet').value = '';
+    const dialog = $('minutesDialog');
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+  }
+
+  async function saveMinutes(event) {
+    event.preventDefault();
+    const account = state.activeBusiness;
+    if (!account) return;
+    const addValue = $('minutesAdd').value.trim();
+    const setValue = $('minutesSet').value.trim();
+    const payload = {};
+    if (setValue !== '') payload.included_minutes = Number(setValue);
+    else if (addValue !== '') payload.add_minutes = Number(addValue);
+    else { showToast('Add minutes or set an included amount first.', 'err'); return; }
+    const value = Number(Object.values(payload)[0]);
+    if (!Number.isFinite(value) || value < 0) {
+      showToast('Enter a positive number of minutes.', 'err');
+      return;
+    }
+    const save = $('minutesSave');
+    save.disabled = true;
+    save.textContent = 'Saving…';
+    try {
+      const result = await api('/api/admin/businesses/' + encodeURIComponent(account.id) + '/minutes', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      $('minutesDialog').close();
+      showToast(result.message || 'Minutes updated.');
+      await refreshAll();
+    } catch (err) {
+      if ((err && err.message) === 'admin_auth_required') return;
+      showToast((err && err.message) || 'Could not update minutes.', 'err');
+    } finally {
+      save.disabled = false;
+      save.textContent = 'Save minutes';
+    }
+  }
+
+  async function logout() {
+    try { await api('/api/admin/logout', { method: 'POST', body: '{}' }); } catch (_) { /* cookie is cleared regardless */ }
+    window.location.assign('/admin');
+  }
+
+  $('accountsBody').addEventListener('click', (event) => {
+    const poolRelease = event.target.closest('[data-biz-pool-release]');
+    if (poolRelease) {
+      releasePoolNumber(poolRelease.dataset.bizPoolRelease, poolRelease);
+      return;
+    }
+    const poolAssign = event.target.closest('[data-biz-pool-assign]');
+    if (poolAssign) {
+      quickAssignBusiness(poolAssign.dataset.bizPoolAssign, poolAssign);
+      return;
+    }
+    const toggle = event.target.closest('[data-toggle]');
+    if (toggle) {
+      toggleBusiness(toggle.dataset.toggle, toggle.dataset.enabled === '1', toggle);
+      return;
+    }
+    const minutesBtn = event.target.closest('[data-minutes]');
+    if (minutesBtn) {
+      const account = state.accounts.find((item) => item.id === minutesBtn.dataset.minutes);
+      if (account) openMinutesDialog(account);
+    }
+  });
+
+  $('poolBody').addEventListener('click', (event) => {
+    const assign = event.target.closest('[data-pool-assign]');
+    if (assign) { openAssignDialog(assign.dataset.poolAssign); return; }
+    const release = event.target.closest('[data-pool-release]');
+    if (release) { releasePoolNumber(release.dataset.poolRelease, release); return; }
+    const toggle = event.target.closest('[data-pool-toggle]');
+    if (toggle) { togglePoolNumber(toggle.dataset.poolToggle, toggle); return; }
+    const forward = event.target.closest('[data-pool-forward]');
+    if (forward) { openForwardDialog(forward.dataset.poolForward); return; }
+    const remove = event.target.closest('[data-pool-delete]');
+    if (remove) { deletePoolNumber(remove.dataset.poolDelete, remove); }
+  });
+
+  document.querySelectorAll('.tabs [data-view]').forEach((tab) => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  $('filterChips').addEventListener('click', (event) => {
+    const chip = event.target.closest('[data-filter]');
+    if (!chip) return;
+    state.filter = chip.dataset.filter || 'all';
+    document.querySelectorAll('#filterChips .chip').forEach((el) => el.classList.toggle('is-active', el === chip));
+    load();
+  });
+
+  let searchTimer = null;
+  $('searchInput').addEventListener('input', (event) => {
+    const value = event.target.value.trim();
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { state.search = value; load(); }, 280);
+  });
+
+  $('poolAddForm').addEventListener('submit', submitPoolNumbers);
+  $('assignForm').addEventListener('submit', submitAssign);
+  $('assignCancel').addEventListener('click', () => $('assignDialog').close());
+  $('forwardForm').addEventListener('submit', submitForward);
+  $('forwardCancel').addEventListener('click', () => $('forwardDialog').close());
+  $('minutesForm').addEventListener('submit', saveMinutes);
+  $('minutesCancel').addEventListener('click', () => $('minutesDialog').close());
+  $('callLogBusiness').addEventListener('change', loadCalls);
+  $('callLogRefresh').addEventListener('click', () => { showToast('Refreshing call log…'); loadCalls(); });
+  $('refreshBtn').addEventListener('click', () => { showToast('Refreshing dashboard…'); refreshAll(); });
+  $('logoutBtn').addEventListener('click', logout);
+
+  setInterval(() => { if (!document.hidden) refreshAll(); }, 30000);
+  switchView('businesses');
+  refreshAll();
+</script>
+</body>
+</html>

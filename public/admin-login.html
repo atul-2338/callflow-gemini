@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0D1B2A" />
+<meta name="robots" content="noindex, nofollow" />
+<title>CallFlow Admin · Sign in</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-2: #122235;
+    --navy-3: #16283E;
+    --gold: #E2A93B;
+    --gold-2: #F3C96B;
+    --danger: #FCA5A5;
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; display: flex; align-items: center; justify-content: center; padding: 22px;
+    background:
+      radial-gradient(760px 460px at 10% -12%, rgba(226, 169, 59, 0.18), transparent 72%),
+      radial-gradient(620px 420px at 92% 108%, rgba(226, 169, 59, 0.1), transparent 70%),
+      var(--navy);
+    color: #E8EEF6; font-family: var(--font); font-size: 15px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .panel {
+    width: min(430px, 100%); background: linear-gradient(170deg, var(--navy-3), var(--navy-2) 55%, var(--navy));
+    border: 1px solid rgba(226, 169, 59, 0.42); border-radius: 22px; padding: 28px 26px 24px;
+    box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .mark {
+    width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--gold-2), var(--gold));
+    color: var(--navy); font-weight: 900; font-size: 15px; letter-spacing: -0.02em;
+    box-shadow: 0 10px 22px -12px rgba(226, 169, 59, 0.9);
+  }
+  .brand strong { display: block; font-size: 14px; letter-spacing: 0.01em; color: #fff; }
+  .brand span { display: block; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 800; }
+  h1 { font-size: 21px; letter-spacing: -0.02em; margin: 20px 0 18px; }
+  .field { margin-bottom: 13px; }
+  label { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 850; color: #94A3B8; margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.32);
+    background: rgba(8, 18, 30, 0.72); color: #F8FAFC; font: inherit; font-size: 13.5px;
+  }
+  input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(226, 169, 59, 0.24); }
+  button {
+    width: 100%; margin-top: 6px; padding: 11px 14px; border: 0; border-radius: 10px; cursor: pointer;
+    background: linear-gradient(150deg, var(--gold-2), var(--gold)); color: var(--navy);
+    font: inherit; font-size: 13px; font-weight: 900; letter-spacing: 0.01em;
+  }
+  button:disabled { opacity: 0.7; cursor: progress; }
+  .status { min-height: 18px; margin: 12px 0 2px; font-size: 11.5px; color: #94A3B8; }
+  .status.err { color: var(--danger); font-weight: 700; }
+  .status.ok { color: var(--gold-2); font-weight: 700; }
+  .foot { margin-top: 16px; font-size: 10.5px; color: #64748B; text-align: center; }
+  .foot a { color: #94A3B8; }
+</style>
+</head>
+<body>
+  <main class="panel">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">CF</span>
+      <span>
+        <strong>CallFlow.biz</strong>
+        <span>Super Admin</span>
+      </span>
+    </div>
+    <h1>Admin sign in</h1>
+    <form id="adminLoginForm" autocomplete="on">
+      <div class="field">
+        <label for="adminEmail">Admin email</label>
+        <input id="adminEmail" name="email" type="email" autocomplete="username" placeholder="admin@callflow.biz" required />
+      </div>
+      <div class="field">
+        <label for="adminPassword">Password</label>
+        <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="Admin password" required />
+      </div>
+      <button type="submit" id="adminLoginBtn">Login</button>
+      <div class="status" id="adminLoginStatus" role="status" aria-live="polite"></div>
+    </form>
+    <p class="foot">Operator access only · <a href="/">Back to callflow.biz</a></p>
+  </main>
+  <script>
+    'use strict';
+    const form = document.getElementById('adminLoginForm');
+    const statusEl = document.getElementById('adminLoginStatus');
+    const button = document.getElementById('adminLoginBtn');
+
+    function setStatus(text, kind) {
+      statusEl.textContent = text || '';
+      statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      if (!email || !password) { setStatus('Enter both the admin email and password.', 'err'); return; }
+      button.disabled = true;
+      setStatus('Verifying admin session…');
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) throw new Error(data.message || data.error || 'Could not sign in.');
+        setStatus('Signed in — opening admin dashboard…', 'ok');
+        window.location.assign(data.redirect || '/admin');
+      } catch (err) {
+        setStatus((err && err.message) || 'Could not sign in.', 'err');
+        button.disabled = false;
+        document.getElementById('adminPassword').select();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "CallFlow.biz — Austin Missed-Call AI",
+  "short_name": "CallFlow",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

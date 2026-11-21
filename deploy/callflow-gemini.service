@@ -1,0 +1,41 @@
+[Unit]
+Description=CallFlow (callflow-gemini Express app)
+Documentation=https://github.com/atul-2338/callflow-gemini
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=callflow
+Group=callflow
+WorkingDirectory=/srv/callflow-gemini
+
+# PORT + HOST + every secret come from this file (see .env.example):
+#   PORT=3001            <- parallel run next to the old app on 3000
+#   HOST=127.0.0.1       <- loopback only; nginx terminates TLS
+#   SQLITE_PATH=/var/data/callflow-gemini/callflow.db
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/callflow-gemini/.env
+
+ExecStart=/usr/bin/node /srv/callflow-gemini/server.js
+
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Hardening: only the app's own data directory is writable.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/var/data/callflow-gemini
+
+[Install]
+WantedBy=multi-user.target
