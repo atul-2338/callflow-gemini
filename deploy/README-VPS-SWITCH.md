@@ -6,6 +6,27 @@ same one line back.
 
 Nothing below deletes the old app, its `.env`, or its database.
 
+## Fast path (2 commands)
+
+```bash
+sudo git clone https://github.com/atul-2338/callflow-gemini.git /srv/callflow-gemini
+sudo bash /srv/callflow-gemini/deploy/vps-bootstrap-gemini.sh
+```
+
+That script creates the user/dirs, builds `.env` from the **live** `/srv/callflow/.env` (secrets
+reused) with `PORT=3001`, `HOST=127.0.0.1` and a fresh database at
+`/var/data/callflow-gemini/callflow.db`, installs the unit, starts it and health checks
+`/api/health` + `/austin/round-rock`. It does **not** touch nginx.
+
+When it reports PASS, flip nginx:
+
+```bash
+sudo bash /srv/callflow-gemini/deploy/vps-bootstrap-gemini.sh --flip-nginx
+```
+
+The long-form manual steps are below if you prefer doing each piece by hand.
+
+
 ---
 
 ## What stays where
