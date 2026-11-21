@@ -171,8 +171,8 @@
   }
   .hero-media { position: relative; min-width: 0; }
   .hero-photo {
-    position: relative; margin: 0; overflow: hidden; aspect-ratio: 4 / 3;
-    border-radius: 20px; border: 1px solid rgba(226, 169, 59, 0.44);
+    position: relative; margin: 0; overflow: hidden; aspect-ratio: 16 / 9; width: 100%;
+    border-radius: 24px; border: 1px solid rgba(226, 169, 59, 0.34);
     background: var(--navy-3); box-shadow: 0 36px 80px -34px rgba(0, 0, 0, 0.9);
   }
   .hero-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 58% 42%; }
@@ -380,7 +380,7 @@
     .mkt-links { order: 3; flex-basis: 100%; margin-left: 0; justify-content: space-between; }
     .hero { grid-template-columns: 1fr; }
     .hero-title, .hero-question, .hero-lede { max-width: none; }
-    .hero-photo { aspect-ratio: 16 / 10; }
+    .hero-photo { aspect-ratio: 16 / 9; }
   }
   @media (max-width: 640px) {
     .bar-inner { padding: 10px 14px; gap: 9px; }
@@ -389,6 +389,7 @@
     .mkt-links { order: 3; gap: 2px; }
     .mkt-link { padding: 7px 8px; font-size: 11px; }
     .wrap { padding: 0 14px; }
+    .hero-photo, .cf-viewport { border-radius: 18px; }
     .hero { padding: 24px 0 30px; }
     .hero-title { font-size: 1.9rem; }
     .hero-actions .btn { flex: 1 1 100%; }
@@ -417,12 +418,13 @@
   .cf-title { margin: 0; font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 850; letter-spacing: -.02em; }
   .cf-sub { margin: 6px 0 0; font-size: 12.5px; color: #94A3B8; }
   .cf-slider { position: relative; }
-  .cf-viewport { overflow: hidden; border-radius: 18px; border: 1px solid rgba(226,169,59,.28); }
-  .cf-track { display: flex; transition: transform .45s cubic-bezier(.22,.61,.36,1); will-change: transform; }
+  .cf-viewport { overflow: hidden; border-radius: 24px; border: 1px solid rgba(226,169,59,.34);
+    background: var(--navy-3); }
+  .cf-track { display: flex; align-items: stretch; transition: transform .45s cubic-bezier(.22,.61,.36,1); will-change: transform; }
   /* aspect-ratio reserves the box before the image loads -> no layout shift */
-  .cf-slide { position: relative; flex: 0 0 100%; margin: 0; aspect-ratio: 16 / 9;
+  .cf-slide { position: relative; flex: 0 0 100%; min-width: 100%; width: 100%; margin: 0; aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, rgba(226,169,59,.18), rgba(13,27,42,.92)); }
-  .cf-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cf-slide img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
   .cf-slide figcaption { position: absolute; inset: auto 0 0 0; margin: 0; padding: 14px 16px;
     background: linear-gradient(to top, rgba(13,27,42,.9), rgba(13,27,42,0));
     color: #E8EEF6; font-size: 12.5px; font-weight: 700; }
@@ -504,7 +506,7 @@
         <div class="hero-media">
           <figure class="hero-photo">
             <!-- Public hero photo slot: swap /assets/hero-plumber.jpg with your own Austin job-site photo. -->
-            <img src="/assets/hero-plumber.jpg" alt="Female Austin plumber in navy workwear with a pipe wrench, reviewing a booked burst-pipe call on her phone" width="1376" height="768" fetchpriority="high" decoding="async" />
+            <img src="/assets/hero-plumber.jpg" alt="Female Austin plumber in navy workwear with a pipe wrench, reviewing a booked burst-pipe call on her phone" width="1200" height="675" fetchpriority="high" decoding="async" />
             <span class="photo-tag">Austin, TX · On the job</span>
             <figcaption class="proof-pill">
               <span><span class="proof-dot" aria-hidden="true"></span>Google Search Call</span>
