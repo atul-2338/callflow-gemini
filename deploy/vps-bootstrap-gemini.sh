@@ -101,7 +101,10 @@ say "==> npm ci --omit=dev"
 runuser -u "$APP_USER" -- bash -c "cd '$APP_DIR' && npm ci --omit=dev"
 install -m 644 "$APP_DIR/deploy/callflow-gemini.service" "/etc/systemd/system/${APP_NAME}.service"
 systemctl daemon-reload
-systemctl enable --now "$APP_NAME" >/dev/null
+systemctl enable "$APP_NAME" >/dev/null 2>&1 || true
+# `restart || true` lets the health gate below print the journal instead of
+# aborting on systemd's non-zero exit before we can show why it failed.
+systemctl restart "$APP_NAME" || true
 say "==> ${APP_NAME}.service started on 127.0.0.1:${PORT}"
 
 # --- health gate ------------------------------------------------------------
