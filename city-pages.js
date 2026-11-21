@@ -79,36 +79,43 @@ const BRAND_SVG =
   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 3h3.2l1 3.4-2 1.7a12.6 12.6 0 0 0 4.8 4.8l1.7-2 3.4 1v3.2a2 2 0 0 1-2.2 2A16.3 16.3 0 0 1 4.6 5.2 2 2 0 0 1 6.6 3Z" /></svg>';
 
 function header() {
-  return `<header class="city-bar">
-      <div class="bar-inner">
-        <a class="brand" href="/">
-          <span class="brand-mark">${BRAND_SVG}</span>
-          <span>
-            <span class="brand-title">CallFlow<span>.biz</span></span>
-            <span class="brand-sub">Missed-call recovery &middot; Austin, TX</span>
-          </span>
-        </a>
-        <nav class="bar-actions" aria-label="CallFlow">
-          <a class="btn btn-ghost" href="${LOGIN_CTA}">Log In</a>
-          <a class="btn btn-gold" href="${TRIAL_CTA}">Start 3-Day Free Trial</a>
-        </nav>
+  return `<header class="mkt-bar">
+    <div class="bar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">${BRAND_SVG}</span>
+        <span>
+          <span class="brand-title">CallFlow<span>.biz</span></span>
+          <span class="brand-sub">Missed-call recovery &middot; Austin, TX</span>
+        </span>
+      </a>
+      <nav class="mkt-links" aria-label="CallFlow sections">
+        <a class="mkt-link" href="/#how-it-works">How It Works</a>
+        <a class="mkt-link" href="/#pricing">Pricing</a>
+        <a class="mkt-link" href="/austin">All cities</a>
+      </nav>
+      <div class="mkt-actions">
+        <a class="btn btn-outline-gold btn-sm" href="${LOGIN_CTA}">Log In</a>
+        <a class="btn btn-primary btn-sm" href="${TRIAL_CTA}">Start 3-Day Free Trial</a>
       </div>
-    </header>`;
+    </div>
+  </header>`;
 }
 
 function footer(currentSlug) {
   const cityLinks = CITY_PAGES.filter((page) => page.slug !== currentSlug)
     .map((page) => `<a href="/austin/${page.slug}">${esc(page.city)}</a>`)
     .join('');
-  return `<footer class="city-foot">
-      <strong>CallFlow.biz</strong> &middot; missed-call recovery and AI dispatch for Central Texas service businesses<br />
-      Calls are answered only after your own line goes unanswered. Results vary by trade and call volume.
-      <nav class="foot-links" aria-label="Austin-area cities"><a href="/austin">All Austin-area cities</a>${cityLinks}</nav>
-      <nav class="foot-links foot-links-legal" aria-label="Legal and support">
-        <a href="/privacy-policy">Privacy Policy</a>
-        <a href="/refund-and-cancellation">Refund and Cancellation</a>
-        <a href="/contact">Contact Us</a>
-      </nav>
+  return `<footer class="mkt-foot">
+      <div class="wrap">
+        <strong>CallFlow.biz</strong> &middot; missed-call recovery and AI dispatch for Central Texas service businesses<br />
+        Calls are answered only after your own line goes unanswered. Results vary by trade and call volume.
+        <nav class="foot-links" aria-label="Austin-area cities"><a href="/austin">All Austin-area cities</a>${cityLinks}</nav>
+        <nav class="foot-links foot-links-legal" aria-label="Legal and support">
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/refund-and-cancellation">Refund and Cancellation</a>
+          <a href="/contact">Contact Us</a>
+        </nav>
+      </div>
     </footer>`;
 }
 
@@ -160,20 +167,36 @@ function faqJsonLd(page) {
 }
 
 function heroHtml(page) {
-  return `<section class="hero">
-    <p class="kicker">${esc(page.city)}, TX &middot; ${esc(page.county)}</p>
-    <h1>Never miss another ${esc(page.city)} customer</h1>
-    <p class="lede">
-      When you are under a sink or up a ladder, calls go to voicemail and the job goes to the next
-      name on Google. CallFlow answers those missed calls in your business name, takes the details
-      and books the appointment &mdash; 24 hours a day.
-    </p>
-    <p class="local">${esc(page.blurb)}</p>
-    <div class="cta-row">
-      <a class="btn btn-gold btn-lg" href="${TRIAL_CTA}">Start the 3-day free trial</a>
-      <a class="btn btn-ghost btn-lg" href="/#pricing">See pricing</a>
+  const city = page ? page.city : 'Central Texas';
+  const eyebrow = page
+    ? `CallFlow.biz &middot; ${esc(page.city)}, TX &middot; ${esc(page.county)}`
+    : 'CallFlow.biz &middot; Austin metro, TX';
+  const lede = page
+    ? page.blurb
+    : 'CallFlow answers the calls plumbers, HVAC technicians and electricians miss across the Austin metro, captures the job details and books the appointment &mdash; 24 hours a day.';
+
+  return `<section class="hero-zone" aria-labelledby="heroTitle">
+    <div class="wrap hero">
+      <div class="hero-copy">
+        <span class="eyebrow-gold">${eyebrow}</span>
+        <h1 class="hero-title" id="heroTitle">Never miss another ${esc(city)} customer</h1>
+        <p class="hero-lede">${esc(lede)}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="${TRIAL_CTA}">Start Adding More Business</a>
+          <a class="btn btn-outline-gold" href="#pricing">See pricing</a>
+        </div>
+        <p class="hero-support">Built for busy plumbing and HVAC businesses.</p>
+      </div>
+      <div class="hero-media">
+        <figure class="hero-photo">
+          <img src="/images/plumber-austin.jpg"
+            alt="Plumber repairing a leaking pipe under a kitchen sink in ${esc(city)}, TX"
+            width="1200" height="675" loading="eager" decoding="async"
+            onerror="this.style.display='none'" />
+          <span class="photo-tag">${esc(city)}, TX &middot; On the job</span>
+        </figure>
+      </div>
     </div>
-    <p class="cta-note">$0 today &middot; then $99/month &middot; cancel anytime &middot; no new phone number needed</p>
   </section>`;
 }
 
@@ -292,15 +315,16 @@ export function renderCityPage(page) {
 </head>
 <body>
 ${header()}
-<main class="city-main">
+<main class="mkt-main">
 ${heroHtml(page)}
+<div class="wrap">
 ${factsHtml(page)}
-${photoHtml(page)}
 ${cardsHtml(page)}
 ${stepsHtml()}
 ${pricingHtml(page)}
 ${faqHtml(page)}
 ${otherCitiesHtml(page.slug)}
+</div>
 </main>
 ${footer(page.slug)}
 </body>
@@ -334,18 +358,9 @@ export function renderAustinIndex() {
 </head>
 <body>
 ${header()}
-<main class="city-main">
-  <section class="hero">
-    <p class="kicker">Austin metro &middot; Texas</p>
-    <h1>Never miss another Central Texas customer</h1>
-    <p class="lede">CallFlow answers the calls plumbers, HVAC technicians and electricians miss across
-      the Austin metro, captures the job details and books the appointment &mdash; 24 hours a day.</p>
-    <div class="cta-row">
-      <a class="btn btn-gold btn-lg" href="${TRIAL_CTA}">Start the 3-day free trial</a>
-    </div>
-    <p class="cta-note">$0 today &middot; then $99/month &middot; cancel anytime</p>
-  </section>
-${photoHtml(null)}
+<main class="mkt-main">
+${heroHtml(null)}
+<div class="wrap">
   <section class="other-cities">
     <h2>Choose your city</h2>
     <div class="city-tiles">${tiles}</div>
@@ -356,6 +371,7 @@ ${photoHtml(null)}
       neighborhoods mean more service work &mdash; and more competition for the same call. The shop
       that answers first usually wins the job, even when it is not the cheapest quote.</p>
   </section>
+</div>
 </main>
 ${footer('')}
 </body>

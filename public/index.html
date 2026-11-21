@@ -422,10 +422,14 @@
     background: var(--navy-3); }
   .cf-track { display: flex; align-items: stretch; transition: transform .45s cubic-bezier(.22,.61,.36,1); will-change: transform; }
   /* aspect-ratio reserves the box before the image loads -> no layout shift */
-  .cf-slide { position: relative; flex: 0 0 100%; min-width: 100%; width: 100%; margin: 0; aspect-ratio: 16 / 9;
+  .cf-slide { position: relative; flex: 0 0 100%; min-width: 100%; width: 100%; height: 100%;
+    margin: 0; padding: 0; display: block; aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, rgba(226,169,59,.18), rgba(13,27,42,.92)); }
-  .cf-slide img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-  .cf-slide figcaption { position: absolute; inset: auto 0 0 0; margin: 0; padding: 14px 16px;
+  .cf-slide > * { display: block; width: 100%; height: 100%; margin: 0; padding: 0; }
+  .cf-slide img { display: block; width: 100%; height: 100%; margin: 0; aspect-ratio: 16 / 9;
+    object-fit: cover; object-position: center; }
+  .cf-slide figcaption { position: absolute; inset: auto 0 0 0; width: auto; height: auto;
+    aspect-ratio: auto; object-fit: fill; margin: 0; padding: 14px 16px;
     background: linear-gradient(to top, rgba(13,27,42,.9), rgba(13,27,42,0));
     color: #E8EEF6; font-size: 12.5px; font-weight: 700; }
   .cf-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px;
