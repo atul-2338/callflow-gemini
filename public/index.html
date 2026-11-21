@@ -10,7 +10,7 @@
 <link rel="manifest" href="/manifest.json" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/icon.svg" />
-<link rel="preload" as="image" href="/assets/hero-plumber.jpg" fetchpriority="high" />
+<link rel="preload" as="image" href="/images/plumber-austin.jpg" fetchpriority="high" />
 <style>
   :root {
     --navy: #0D1B2A;
@@ -175,7 +175,8 @@
     border-radius: 24px; border: 1px solid rgba(226, 169, 59, 0.34);
     background: var(--navy-3); box-shadow: 0 36px 80px -34px rgba(0, 0, 0, 0.9);
   }
-  .hero-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 58% 42%; }
+  .hero-photo img { display: block; width: 100%; height: 100%; margin: 0;
+    aspect-ratio: 16 / 9; object-fit: cover; object-position: center; }
   .hero-photo::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(180deg, transparent 52%, rgba(7, 16, 28, 0.66) 100%);
@@ -509,8 +510,8 @@
         </div>
         <div class="hero-media">
           <figure class="hero-photo">
-            <!-- Public hero photo slot: swap /assets/hero-plumber.jpg with your own Austin job-site photo. -->
-            <img src="/assets/hero-plumber.jpg" alt="Female Austin plumber in navy workwear with a pipe wrench, reviewing a booked burst-pipe call on her phone" width="1200" height="675" fetchpriority="high" decoding="async" />
+            <!-- Single shared hero photo: same file and same box on /, /austin and every city page. -->
+            <img src="/images/plumber-austin.jpg" alt="Female Austin plumber in navy workwear repairing a leaking pipe under a kitchen sink" width="1200" height="675" fetchpriority="high" decoding="async" />
             <span class="photo-tag">Austin, TX · On the job</span>
             <figcaption class="proof-pill">
               <span><span class="proof-dot" aria-hidden="true"></span>Google Search Call</span>
