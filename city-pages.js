@@ -205,6 +205,19 @@ function cardsHtml(page) {
   </section>`;
 }
 
+function photoHtml(page) {
+  const city = page ? page.city : 'Austin';
+  const alt = `Plumber repairing a leaking pipe under a kitchen sink in ${city}, TX`;
+  const caption = `Local ${city} job: leak found, parts on the truck, fixed the same visit.`;
+  return `<section class="photo-block" aria-label="Plumbing work in ${esc(city)}">
+    <figure class="photo-figure">
+      <img src="/images/plumber-austin.jpg" alt="${esc(alt)}" width="1200" height="675"
+        loading="lazy" decoding="async" onerror="this.style.display='none'" />
+      <figcaption>${esc(caption)}</figcaption>
+    </figure>
+  </section>`;
+}
+
 function stepsHtml() {
   return `<section class="steps">
     <h2>How it works</h2>
@@ -282,6 +295,7 @@ ${header()}
 <main class="city-main">
 ${heroHtml(page)}
 ${factsHtml(page)}
+${photoHtml(page)}
 ${cardsHtml(page)}
 ${stepsHtml()}
 ${pricingHtml(page)}
@@ -331,6 +345,7 @@ ${header()}
     </div>
     <p class="cta-note">$0 today &middot; then $99/month &middot; cancel anytime</p>
   </section>
+${photoHtml(null)}
   <section class="other-cities">
     <h2>Choose your city</h2>
     <div class="city-tiles">${tiles}</div>

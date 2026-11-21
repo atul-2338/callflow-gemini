@@ -68,6 +68,16 @@ h1 { margin: 0; font-size: clamp(1.9rem, 4.4vw, 2.9rem); line-height: 1.12; lett
 .card h2 { margin: 0 0 6px; font-size: 15px; color: var(--gold-2); }
 .card p { margin: 0; font-size: 13.5px; color: #C7D2E0; }
 
+/* ---------- plumbing photo ---------- */
+.photo-block { margin-top: 34px; }
+.photo-figure { position: relative; margin: 0; aspect-ratio: 16 / 9; border-radius: 16px;
+  overflow: hidden; border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(226,169,59,.18), rgba(13,27,42,.94)); }
+.photo-figure img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.photo-figure figcaption { position: absolute; inset: auto 0 0 0; padding: 12px 14px;
+  background: linear-gradient(to top, rgba(13,27,42,.92), rgba(13,27,42,0));
+  color: #E8EEF6; font-size: 12px; font-weight: 600; }
+
 /* ---------- steps / pricing / faq ---------- */
 .steps, .pricing, .faq, .other-cities { margin-top: 42px; }
 .steps h2, .pricing h2, .faq h2, .other-cities h2 { margin: 0 0 14px; font-size: 20px; letter-spacing: -.02em; }

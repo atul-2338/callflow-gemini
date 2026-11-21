@@ -411,6 +411,36 @@
     * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
   }
 
+  /* ---------- homepage image slider ---------- */
+  .cf-head { max-width: 720px; margin-bottom: 14px; }
+  .cf-title { margin: 0; font-size: clamp(1.25rem, 2.4vw, 1.7rem); font-weight: 850; letter-spacing: -.02em; }
+  .cf-sub { margin: 6px 0 0; font-size: 12.5px; color: #94A3B8; }
+  .cf-slider { position: relative; }
+  .cf-viewport { overflow: hidden; border-radius: 18px; border: 1px solid rgba(226,169,59,.28); }
+  .cf-track { display: flex; transition: transform .45s cubic-bezier(.22,.61,.36,1); will-change: transform; }
+  /* aspect-ratio reserves the box before the image loads -> no layout shift */
+  .cf-slide { position: relative; flex: 0 0 100%; margin: 0; aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, rgba(226,169,59,.18), rgba(13,27,42,.92)); }
+  .cf-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cf-slide figcaption { position: absolute; inset: auto 0 0 0; margin: 0; padding: 14px 16px;
+    background: linear-gradient(to top, rgba(13,27,42,.9), rgba(13,27,42,0));
+    color: #E8EEF6; font-size: 12.5px; font-weight: 700; }
+  .cf-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px;
+    display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(226,169,59,.5);
+    background: rgba(13,27,42,.75); color: #E2A93B; font-size: 20px; line-height: 1;
+    cursor: pointer; padding: 0; }
+  .cf-nav:hover { background: #E2A93B; color: #0D1B2A; }
+  .cf-prev { left: 10px; }
+  .cf-next { right: 10px; }
+  .cf-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .cf-dot { width: 9px; height: 9px; padding: 0; border-radius: 50%; cursor: pointer;
+    border: 1px solid rgba(226,169,59,.6); background: transparent; }
+  .cf-dot.is-active { background: #E2A93B; border-color: #E2A93B; }
+  @media (max-width: 640px) {
+    .cf-nav { width: 32px; height: 32px; font-size: 17px; }
+    .cf-slide figcaption { font-size: 11.5px; padding: 10px 12px; }
+  }
+
 
 
 
@@ -546,6 +576,35 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+    <section class="band" id="gallery">
+      <div class="wrap">
+        <div class="cf-head">
+          <h2 class="cf-title">Inside a real Austin plumbing day</h2>
+          <p class="cf-sub">Photos from the trucks and the jobs CallFlow is answering for right now.</p>
+        </div>
+        <div class="cf-slider" id="cfSlider" role="region" aria-roledescription="carousel" aria-label="Plumbing work gallery">
+          <div class="cf-viewport">
+            <div class="cf-track" id="cfTrack">
+              <figure class="cf-slide">
+                <img src="/images/slider-1.jpg" alt="Plumber tightening a compression fitting under a kitchen sink" width="1200" height="675" loading="eager" decoding="async" onerror="this.style.display='none'" />
+                <figcaption>Under-sink leak stopped the same afternoon &middot; Zilker</figcaption>
+              </figure>
+              <figure class="cf-slide">
+                <img src="/images/slider-2.jpg" alt="Technician replacing a failed water heater in a garage" width="1200" height="675" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+                <figcaption>Water heater swap booked from a missed call &middot; Round Rock</figcaption>
+              </figure>
+              <figure class="cf-slide">
+                <img src="/images/slider-3.jpg" alt="Plumber clearing a blocked drain line in a bathroom" width="1200" height="675" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+                <figcaption>Drain backup cleared before the weekend &middot; Pflugerville</figcaption>
+              </figure>
+            </div>
+          </div>
+          <button class="cf-nav cf-prev" type="button" aria-label="Previous photo" data-cf-prev>&#8249;</button>
+          <button class="cf-nav cf-next" type="button" aria-label="Next photo" data-cf-next>&#8250;</button>
+          <div class="cf-dots" id="cfDots" role="tablist" aria-label="Choose photo"></div>
         </div>
       </div>
     </section>
@@ -923,6 +982,61 @@
       else if (params.get('trial') === '1' || params.get('signup') === '1') openAuth('trial');
       else setMode('login', false);
       applyPlanNote();
+    })();
+  </script>
+  <script>
+    // Homepage gallery: prev / next / dots / swipe / arrow keys. No dependencies.
+    (function () {
+      var root = document.getElementById('cfSlider');
+      if (!root) return;
+      var track = document.getElementById('cfTrack');
+      var dotsBox = document.getElementById('cfDots');
+      if (!track || !dotsBox) return;
+      var slides = Array.prototype.slice.call(track.children);
+      if (slides.length < 2) return;
+      var index = 0;
+
+      slides.forEach(function (_, i) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'cf-dot';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', 'Go to photo ' + (i + 1));
+        dot.addEventListener('click', function () { go(i); });
+        dotsBox.appendChild(dot);
+      });
+      var dots = Array.prototype.slice.call(dotsBox.children);
+
+      function go(next) {
+        index = (next + slides.length) % slides.length;
+        track.style.transform = 'translateX(' + (-index * 100) + '%)';
+        dots.forEach(function (dot, i) {
+          dot.classList.toggle('is-active', i === index);
+          dot.setAttribute('aria-selected', String(i === index));
+        });
+        slides.forEach(function (slide, i) {
+          slide.setAttribute('aria-hidden', String(i !== index));
+        });
+      }
+
+      root.querySelector('[data-cf-prev]').addEventListener('click', function () { go(index - 1); });
+      root.querySelector('[data-cf-next]').addEventListener('click', function () { go(index + 1); });
+      root.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowLeft') go(index - 1);
+        if (event.key === 'ArrowRight') go(index + 1);
+      });
+
+      var startX = null;
+      root.addEventListener('pointerdown', function (event) { startX = event.clientX; });
+      root.addEventListener('pointerup', function (event) {
+        if (startX === null) return;
+        var dx = event.clientX - startX;
+        startX = null;
+        if (Math.abs(dx) > 40) go(index + (dx < 0 ? 1 : -1));
+      });
+      root.addEventListener('pointercancel', function () { startX = null; });
+
+      go(0);
     })();
   </script>
 </body>
