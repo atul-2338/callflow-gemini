@@ -319,7 +319,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PUBLIC_SITE_URL = String(process.env.PUBLIC_SITE_URL || 'https://callflow.biz').replace(/\/+$/, '');
 
 app.get('/austin', (_req, res) => {
-  res.set('Cache-Control', 'public, max-age=3600');
+  // HTML must revalidate on every load (ETag still makes it a cheap 304), so a
+  // deploy is never hidden behind a stale browser copy for up to an hour.
+  res.set('Cache-Control', 'no-cache');
   res.type('html').send(renderAustinIndex());
 });
 
@@ -327,7 +329,7 @@ app.get('/austin/:city', (req, res, next) => {
   const slug = String(req.params.city || '').trim().toLowerCase();
   const page = CITY_BY_SLUG.get(slug);
   if (!page) return next(); // unknown city -> normal 404 handling
-  res.set('Cache-Control', 'public, max-age=3600');
+  res.set('Cache-Control', 'no-cache');
   res.type('html').send(renderCityPage(page));
 });
 

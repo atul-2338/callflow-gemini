@@ -9,9 +9,21 @@
 // Routes are registered in server.js: GET /austin and GET /austin/:city.
 // ---------------------------------------------------------------------------
 
+import fs from 'node:fs';
+
 const SITE_URL = String(process.env.PUBLIC_SITE_URL || 'https://callflow.biz').replace(/\/+$/, '');
 const TRIAL_CTA = '/?trial=1';
 const LOGIN_CTA = '/?login=1';
+
+// Cache-buster for city.css: changes automatically whenever the file is edited,
+// so a deployed CSS change can never sit behind a stale browser copy.
+const CITY_CSS_VERSION = (() => {
+  try {
+    return String(Math.floor(fs.statSync(new URL('./public/city.css', import.meta.url)).mtimeMs));
+  } catch {
+    return '1';
+  }
+})();
 
 export const CITY_PAGES = [
   {
@@ -309,7 +321,7 @@ export function renderCityPage(page) {
 <meta property="og:url" content="${SITE_URL}/austin/${page.slug}" />
 <meta property="og:site_name" content="CallFlow.biz" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-<link rel="stylesheet" href="/city.css" />
+<link rel="stylesheet" href="/city.css?v=${CITY_CSS_VERSION}" />
 <script type="application/ld+json">${serviceJsonLd(page)}</script>
 <script type="application/ld+json">${faqJsonLd(page)}</script>
 </head>
@@ -354,7 +366,7 @@ export function renderAustinIndex() {
 <meta property="og:description" content="${esc(description)}" />
 <meta property="og:url" content="${SITE_URL}/austin" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-<link rel="stylesheet" href="/city.css" />
+<link rel="stylesheet" href="/city.css?v=${CITY_CSS_VERSION}" />
 </head>
 <body>
 ${header()}
