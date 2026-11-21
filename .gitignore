@@ -43,3 +43,7 @@ desktop.ini
 
 # Unreferenced local media export (690 KB, not used by any page)
 Gemini_Generated_Image_*.jfif
+
+# Slider export sources: the site serves the optimised slider-N.jpg files.
+# Keep these PNG originals on disk if you like, but never commit them again.
+/public/images/slider-*.png
