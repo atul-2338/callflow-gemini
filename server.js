@@ -182,6 +182,85 @@ function recoverSessionFromCheckout(req, res) {
   return shopUser;
 }
 
+// ---------------------------------------------------------------------------
+// Subscription / trial wording
+//
+// One server-derived summary so the dashboard banner, the settings panel and
+// any future surface all show the same status, day count and message.
+// ---------------------------------------------------------------------------
+const SUBSCRIPTION_STATUS_LABELS = {
+  trialing: 'Trial',
+  active: 'Active plan',
+  on_hold: 'Payment on hold',
+  past_due: 'Payment past due',
+  cancelled: 'Cancelled',
+  expired: 'Expired',
+};
+
+function subscriptionSummary(plumber, subscription) {
+  const plan = store.planSnapshot(plumber);
+  const status = String((subscription && subscription.status) || plan.subscription_status || 'trialing').toLowerCase();
+  const rawDays = plan.trial_days_left;
+  const trialDaysLeft = rawDays === null || rawDays === undefined ? null : Math.max(0, Math.round(Number(rawDays)));
+  const trialEnded = Boolean(plan.trial_expired) || (trialDaysLeft !== null && trialDaysLeft <= 0);
+  const periodEnd = (subscription && subscription.current_period_end) || null;
+
+  let tone = 'neutral';
+  let label = SUBSCRIPTION_STATUS_LABELS[status] || status.replace(/_/g, ' ');
+  let message = 'Billing status is syncing — refresh in a moment.';
+  let action = null;
+
+  if (status === 'trialing') {
+    label = trialEnded
+      ? 'Trial ended'
+      : trialDaysLeft === null
+        ? 'Trial'
+        : `Trial: ${trialDaysLeft} ${trialDaysLeft === 1 ? 'day' : 'days'} left`;
+    tone = trialEnded || (trialDaysLeft !== null && trialDaysLeft <= 2) ? 'warning' : 'trial';
+    message = trialEnded
+      ? 'Your 3-day trial has ended. Subscribe to Solo to keep answering missed calls — if you just paid, activation can take a few seconds.'
+      : `Full access${trialDaysLeft === null ? '' : ` for ${trialDaysLeft} more ${trialDaysLeft === 1 ? 'day' : 'days'}`}. After the trial it is $99/month, cancel anytime. Just paid? Your plan activates within seconds.`;
+    action = 'upgrade';
+  } else if (status === 'active') {
+    tone = 'active';
+    label = 'Active plan';
+    message = 'Solo plan active — $99/month, cancel anytime.';
+  } else if (status === 'past_due' || status === 'on_hold') {
+    tone = 'warning';
+    label = SUBSCRIPTION_STATUS_LABELS[status];
+    message = 'We could not collect the last payment. Update your payment method to keep calls flowing — your workspace keeps working while Dodo retries.';
+    action = 'upgrade';
+  } else if (status === 'cancelled' || status === 'expired') {
+    tone = 'danger';
+    label = SUBSCRIPTION_STATUS_LABELS[status];
+    message = status === 'cancelled'
+      ? 'Your Solo subscription is cancelled. Subscribe again to keep capturing missed calls.'
+      : 'Your subscription has expired. Subscribe again to reactivate AI call capture.';
+    action = 'upgrade';
+  }
+
+  return {
+    status,
+    status_label: SUBSCRIPTION_STATUS_LABELS[status] || status,
+    label,
+    message,
+    tone,
+    action,
+    trial_days_left: trialDaysLeft,
+    trial_ends_at: plan.trial_ends_at || null,
+    trial_expired: trialEnded,
+    current_period_end: periodEnd,
+    is_paid: plan.is_paid,
+    is_trial: plan.is_trial,
+    plan_type: plan.plan_type,
+    included_minutes: plan.minutes_included,
+    used_minutes: plan.minutes_used,
+    remaining_minutes: plan.minutes_left,
+    daily_lead_limit: plan.daily_lead_limit,
+    leads_today: store.countLeadsToday(plumber.id),
+  };
+}
+
 function authMiddleware(req, _res, next) {
   const auth = sessionForRequest(req);
   if (auth) {
@@ -1431,6 +1510,8 @@ app.get('/api/bootstrap', (req, res) => {
     leads,
     pushCount: pushSubscriptions.length,
     metrics: { bookedCount, bookedRevenueUsd, totalLeads: leads.length },
+    // Server-derived trial/subscription wording used by the dashboard banner.
+    subscription: subscriptionSummary(plumber, subscription),
     billing: {
       status: subscription ? subscription.status : plan.subscription_status,
       plan_code: subscription ? subscription.plan_code : (plan.is_paid ? 'solo_99' : 'trial_3day'),
@@ -1589,6 +1670,7 @@ app.get('/api/billing/status', (req, res) => {
     },
     ready_for_checkout: config.configured,
     missing: config.missing,
+    subscription: subscriptionSummary(plumber, subscription),
   });
 });
 

@@ -575,6 +575,30 @@
   }
   .banner[hidden] { display: none; }
   .banner-title { font-weight: 850; color: var(--gold); font-size: 12.5px; }
+
+  /* ---------- trial / subscription status banner ---------- */
+  .plan-banner {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between;
+    margin: 14px 0 0; padding: 11px 14px; border-radius: 13px;
+    border: 1px solid rgba(148, 163, 184, .25); background: rgba(27, 46, 70, .55); color: #CBD5E1;
+  }
+  .plan-banner[hidden] { display: none; }
+  .plan-banner .plan-pill {
+    display: inline-flex; align-items: center; gap: 6px; flex: none;
+    font-size: 10.5px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid rgba(226, 169, 59, .5); color: var(--gold); background: rgba(226, 169, 59, .1);
+  }
+  .plan-banner .plan-msg { flex: 1 1 320px; font-size: 12.5px; line-height: 1.5; color: #CBD5E1; }
+  .plan-banner.tone-active { border-color: rgba(134, 239, 172, .35); background: rgba(20, 83, 45, .22); }
+  .plan-banner.tone-active .plan-pill { color: #BBF7D0; border-color: rgba(134, 239, 172, .5); background: rgba(20, 83, 45, .35); }
+  .plan-banner.tone-warning { border-color: rgba(250, 204, 21, .35); background: rgba(120, 53, 15, .26); }
+  .plan-banner.tone-warning .plan-pill { color: #FDE68A; border-color: rgba(250, 204, 21, .5); background: rgba(120, 53, 15, .4); }
+  .plan-banner.tone-danger { border-color: rgba(252, 165, 165, .35); background: rgba(127, 29, 29, .3); }
+  .plan-banner.tone-danger .plan-pill { color: #FECACA; border-color: rgba(252, 165, 165, .5); background: rgba(127, 29, 29, .42); }
+  @media (max-width: 640px) {
+    .plan-banner .plan-msg { flex-basis: 100%; }
+  }
   .notice {
     display: flex; gap: 9px; padding: 10px 12px; border-radius: 10px;
     background: var(--warn-bg); border: 1px solid #FCD34D; color: var(--warn); font-size: 11.5px;
@@ -830,6 +854,12 @@
         <button class="btn btn-sm btn-primary" id="refreshBillingBtn" type="button">Refresh billing status</button>
         <button class="btn btn-sm btn-ghost" id="dismissBannerBtn" type="button">Dismiss</button>
       </div>
+    </div>
+
+    <div class="plan-banner" id="planBanner" hidden>
+      <span class="plan-pill" id="planPill">Plan</span>
+      <span class="plan-msg" id="planMessage"></span>
+      <button class="btn btn-sm btn-primary" id="planAction" type="button" hidden>Upgrade to Solo — $99/mo</button>
     </div>
 
     <section class="view" id="view-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
@@ -1501,6 +1531,42 @@
       if (s === 'cancelled' || s === 'expired') return 'badge-emergency';
       return 'badge-unknown';
     };
+
+    // Trial / subscription banner — driven entirely by the server summary so the
+    // day count, status and wording stay identical across every endpoint.
+    function renderPlanBanner(summary) {
+      const banner = $('planBanner');
+      if (!banner || !summary) return;
+      const pill = $('planPill');
+      const msg = $('planMessage');
+      const action = $('planAction');
+      const tag = $('dashboardPlanTag');
+
+      banner.className = 'plan-banner tone-' + (summary.tone || 'neutral');
+      banner.hidden = false;
+      if (pill) pill.textContent = summary.label || 'Plan';
+      if (tag) tag.textContent = summary.label || 'Plan';
+
+      let text = summary.message || '';
+      if (summary.status === 'active' && summary.current_period_end) {
+        const when = new Date(summary.current_period_end);
+        if (!Number.isNaN(when.getTime())) {
+          text = `Solo plan active — $99/month · renews ${when.toLocaleDateString()}.`;
+        }
+      }
+      if (msg) msg.textContent = text;
+
+      if (action) {
+        const canUpgrade = summary.action === 'upgrade';
+        action.hidden = !canUpgrade;
+        if (canUpgrade) {
+          action.textContent = summary.status === 'trialing' ? 'Upgrade to Solo — $99/mo' : 'Fix billing';
+          action.onclick = () => startCheckout('billingStatus', 'startPlanBtn');
+        } else {
+          action.onclick = null;
+        }
+      }
+    }
     const WITHHELD_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20" /><path d="M6.6 3h3.2l1 3.4-2 1.7a12.6 12.6 0 0 0 4.8 4.8l1.7-2 3.4 1v3.2a2 2 0 0 1-2.2 2A16.3 16.3 0 0 1 4.6 5.2 2 2 0 0 1 6.6 3Z" /></svg>';
 
     function setLive(text) { const el = $('liveStatus'); if (el) el.textContent = text; }
@@ -1930,6 +1996,8 @@
         button.disabled = false;
         button.textContent = billing.status === 'active' ? 'Manage Solo subscription' : 'Subscribe to Solo — $99/mo';
       }
+
+      if (billing.subscription) renderPlanBanner(billing.subscription);
     }
 
     async function loadBilling(announce) {
@@ -2489,6 +2557,7 @@
           if (res.status === 401) { window.location.assign('/?login=1'); return null; }
           if (!res.ok) return null;
           boot = await res.json();
+          if (boot && boot.subscription) renderPlanBanner(boot.subscription);
           paintReadiness(boot.readiness);
           fillWizardForm(boot.plumber);
           paintSetup();
