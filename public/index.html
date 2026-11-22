@@ -897,6 +897,14 @@
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok || data.ok === false) throw new Error(data.message || data.error || 'Could not complete that request.');
+        // New shop: the server already started a Dodo checkout, so go straight
+        // there. The return URL brings them back to /app?billing=success, where
+        // the dashboard picks up the paid plan.
+        if (data.checkoutUrl) {
+          setAuthStatus('Account created — opening secure checkout…', 'ok');
+          window.location.assign(data.checkoutUrl);
+          return;
+        }
         setAuthStatus('Signed in — opening your workspace…', 'ok');
         window.location.assign(data.redirect || '/app');
       } catch (err) {

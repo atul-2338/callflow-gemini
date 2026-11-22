@@ -924,7 +924,7 @@ app.post('/api/auth/login', (req, res) => {
   return res.json({ ok: true, redirect: '/app', user: { email: user.email }, plumber: publicPlumber(plumber) });
 });
 
-app.post('/api/auth/signup', (req, res) => {
+app.post('/api/auth/signup', async (req, res) => {
   const body = req.body || {};
   const businessName = String(body.business_name || '').trim();
   const ownerName = String(body.owner_name || '').trim();
@@ -955,7 +955,38 @@ app.post('/api/auth/signup', (req, res) => {
       return res.status(status).json({ ok: false, error: result.reason, message: result.reason === 'email_in_use' ? 'That email already has a shop.' : 'Could not assign a local trial number. Try again.' });
     }
     startSession(res, result.user);
-    return res.status(201).json({ ok: true, redirect: '/app', user: { email: result.user.email }, plumber: publicPlumber(result.plumber) });
+
+    const payload = {
+      ok: true,
+      redirect: '/app',
+      user: { email: result.user.email },
+      plumber: publicPlumber(result.plumber),
+    };
+
+    // Start Dodo checkout straight after the shop + session are persisted, so a
+    // new owner pays before landing on the dashboard. Wrapped so a Dodo outage
+    // can never fail the signup itself — the client just falls back to /app.
+    let checkout = null;
+    try {
+      checkout = await createDodoCheckout(req, result.plumber);
+    } catch (err) {
+      console.warn('[auth] signup checkout threw: ' + (err?.message || err));
+    }
+    if (checkout && checkout.ok) {
+      // Preserves the commit 959cde0 return flow when the browser comes back
+      // to /app?billing=success&plumber=... .
+      res.append('Set-Cookie', checkoutCookie(result.plumber.id));
+      payload.checkoutUrl = checkout.payload.checkoutUrl;
+      payload.checkoutSessionId = checkout.payload.sessionId || null;
+      payload.checkoutRequired = true;
+      console.log('[auth] signup ' + result.plumber.id + ' -> dodo checkout ' + (checkout.payload.sessionId || ''));
+    } else {
+      payload.checkoutRequired = false;
+      payload.checkoutError = (checkout && (checkout.payload?.error || checkout.payload?.reason)) || 'checkout_unavailable';
+      console.warn('[auth] signup without checkout ' + JSON.stringify({ plumberId: result.plumber.id, error: payload.checkoutError }));
+    }
+
+    return res.status(201).json(payload);
   } catch (err) {
     console.error('[auth] signup failed: ' + (err?.message || err));
     const duplicate = String(err?.message || '').includes('UNIQUE');
@@ -1561,21 +1592,26 @@ app.get('/api/billing/status', (req, res) => {
   });
 });
 
-app.post('/api/billing/checkout', async (req, res) => {
+// Creates a Dodo checkout for a shop. Shared by the explicit checkout button
+// and by POST /api/auth/signup, so a brand-new shop goes straight to payment
+// instead of landing on /app and wondering why nothing happened.
+async function createDodoCheckout(req, plumber, planCode = 'solo_99') {
   const config = billingConfig(req);
-  const planCode = 'solo_99';
 
   if (!config.configured) {
-    return res.status(400).json({
+    return {
       ok: false,
-      configured: false,
-      missing: config.missing,
-      message: 'Dodo Payments is not configured yet. Add ' + config.missing.join(' and ') + ' to .env, then restart the server.',
-      configured_keys: config,
-    });
+      httpStatus: 400,
+      payload: {
+        ok: false,
+        configured: false,
+        missing: config.missing,
+        message: 'Dodo Payments is not configured yet. Add ' + config.missing.join(' and ') + ' to .env, then restart the server.',
+        configured_keys: config,
+      },
+    };
   }
 
-  const plumber = req.plumber;
   // Carry the shop id on the return URL as well as in the cookie, so the
   // post-checkout page can always resolve which shop just paid.
   const returnUrlObj = new URL('/app?billing=success', appBaseUrl(req));
@@ -1615,23 +1651,31 @@ app.post('/api/billing/checkout', async (req, res) => {
     if (!response.ok) {
       console.error('[billing] dodo checkout failed status=' + response.status + ' body=' + String(text).slice(0, 400));
       const dodoCode = (json && (json.code || json.error_code)) || null;
-      return res.status(502).json({
+      return {
         ok: false,
-        configured: true,
-        status: response.status,
-        code: dodoCode,
-        message: 'Dodo Payments rejected the checkout request.',
-        error: (json && (json.message || json.error)) || String(text).slice(0, 300) || 'unknown_error',
-        hint: dodoCode === 'INVALID_REQUEST_BODY'
-          ? 'Check DODO_PLAN_SOLO_ID belongs to this environment, and that no partial customer object is sent.'
-          : undefined,
-      });
+        httpStatus: 502,
+        payload: {
+          ok: false,
+          configured: true,
+          status: response.status,
+          code: dodoCode,
+          message: 'Dodo Payments rejected the checkout request.',
+          error: (json && (json.message || json.error)) || String(text).slice(0, 300) || 'unknown_error',
+          hint: dodoCode === 'INVALID_REQUEST_BODY'
+            ? 'Check DODO_PLAN_SOLO_ID belongs to this environment, and that no partial customer object is sent.'
+            : undefined,
+        },
+      };
     }
 
     const checkoutUrl = (json && (json.checkout_url || json.checkoutUrl)) || null;
     if (!checkoutUrl) {
       console.error('[billing] dodo checkout response missing checkout_url: ' + String(text).slice(0, 400));
-      return res.status(502).json({ ok: false, configured: true, message: 'Dodo Payments returned no checkout_url.', session_id: (json && json.session_id) || null });
+      return {
+        ok: false,
+        httpStatus: 502,
+        payload: { ok: false, configured: true, message: 'Dodo Payments returned no checkout_url.', session_id: (json && json.session_id) || null },
+      };
     }
 
     const sessionId = (json && json.session_id) || null;
@@ -1641,14 +1685,27 @@ app.post('/api/billing/checkout', async (req, res) => {
       phoneNumber: prefill.customer.phone_number,
     });
     console.log('[billing] checkout session created ' + JSON.stringify({ plumberId: plumber.id, planCode, sessionId, returnUrl, mode: config.mode, currency, billingAddress: address, customerName: prefill.customer.name, customerNameSource: prefill.nameSource, customerEmailSource: prefill.emailSource, customerRecord }));
-    // Ties the checkout return back to this shop even if the session cookie is lost.
-    res.append('Set-Cookie', checkoutCookie(plumber.id));
-    res.json({ ok: true, checkoutUrl, sessionId, planCode, returnUrl, mode: config.mode, currency, billingAddress: address, customerName: prefill.customer.name, customerNameSource: prefill.nameSource, customerPrefill: prefill.emailSource, customerRecord });
+    return {
+      ok: true,
+      httpStatus: 200,
+      payload: { ok: true, checkoutUrl, sessionId, planCode, returnUrl, mode: config.mode, currency, billingAddress: address, customerName: prefill.customer.name, customerNameSource: prefill.nameSource, customerPrefill: prefill.emailSource, customerRecord },
+    };
   } catch (err) {
     const reason = err && err.name === 'TimeoutError' ? 'request_timeout' : 'request_failed';
     console.error('[billing] dodo checkout error: ' + ((err && err.message) || String(err)));
-    res.status(502).json({ ok: false, configured: true, message: 'Could not reach Dodo Payments.', error: (err && err.message) || String(err), reason });
+    return {
+      ok: false,
+      httpStatus: 502,
+      payload: { ok: false, configured: true, message: 'Could not reach Dodo Payments.', error: (err && err.message) || String(err), reason },
+    };
   }
+}
+
+app.post('/api/billing/checkout', async (req, res) => {
+  const result = await createDodoCheckout(req, req.plumber);
+  // Ties the checkout return back to this shop even if the session cookie is lost.
+  if (result.ok) res.append('Set-Cookie', checkoutCookie(req.plumber.id));
+  return res.status(result.httpStatus).json(result.payload);
 });
 
 app.post('/api/plumber/settings', (req, res) => {
