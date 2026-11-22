@@ -79,6 +79,7 @@ fi
 set_kv "$ENV_FILE" PORT "$PORT"
 set_kv "$ENV_FILE" HOST "127.0.0.1"
 set_kv "$ENV_FILE" SQLITE_PATH "$DATA_DIR/callflow.db"
+set_kv "$ENV_FILE" CHAT_ANALYTICS_DB_PATH "$DATA_DIR/chat_analytics.db"
 set_kv "$ENV_FILE" APP_BASE_URL "https://callflow.biz"
 set_kv "$ENV_FILE" PUBLIC_SITE_URL "https://callflow.biz"
 chown "$APP_USER:$APP_USER" "$ENV_FILE"

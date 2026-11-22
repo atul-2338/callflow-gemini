@@ -124,6 +124,7 @@ function footer(currentSlug) {
         <nav class="foot-links" aria-label="Austin-area cities"><a href="/austin">All Austin-area cities</a>${cityLinks}</nav>
         <nav class="foot-links foot-links-legal" aria-label="Legal and support">
           <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
           <a href="/refund-and-cancellation">Refund and Cancellation</a>
           <a href="/contact">Contact Us</a>
         </nav>
@@ -322,6 +323,7 @@ export function renderCityPage(page) {
 <meta property="og:site_name" content="CallFlow.biz" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="/city.css?v=${CITY_CSS_VERSION}" />
+<link rel="stylesheet" href="/chat.css" />
 <script type="application/ld+json">${serviceJsonLd(page)}</script>
 <script type="application/ld+json">${faqJsonLd(page)}</script>
 </head>
@@ -339,6 +341,7 @@ ${otherCitiesHtml(page.slug)}
 </div>
 </main>
 ${footer(page.slug)}
+<script src="/chat.js" defer></script>
 </body>
 </html>`;
 }
@@ -367,6 +370,7 @@ export function renderAustinIndex() {
 <meta property="og:url" content="${SITE_URL}/austin" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="/city.css?v=${CITY_CSS_VERSION}" />
+<link rel="stylesheet" href="/chat.css" />
 </head>
 <body>
 ${header()}
@@ -386,6 +390,7 @@ ${heroHtml(null)}
 </div>
 </main>
 ${footer('')}
+<script src="/chat.js" defer></script>
 </body>
 </html>`;
 }
@@ -393,10 +398,12 @@ ${footer('')}
 export function sitemapEntries() {
   return [
     '/',
+    '/austin',
+    '/privacy',
+    '/terms',
     '/privacy-policy',
     '/refund-and-cancellation',
     '/contact',
-    '/austin',
     ...CITY_PAGES.map((page) => `/austin/${page.slug}`),
   ];
 }

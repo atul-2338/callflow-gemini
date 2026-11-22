@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import webpush from 'web-push';
 import { initDatabase } from './db.js';
+import { initChatAnalytics } from './chat-analytics.js';
 import { CITY_BY_SLUG, renderAustinIndex, renderCityPage, sitemapEntries } from './city-pages.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const store = initDatabase(process.env.SQLITE_PATH || './data/callflow.db');
+
+// Chat analytics lives in its OWN database file — never the customer/lead DB.
+const chatAnalytics = initChatAnalytics();
 
 const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || '';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
@@ -37,6 +41,8 @@ const PUBLIC_API_PATHS = new Set([
   '/api/auth/demo',
   '/api/auth/logout',
   '/api/contact',
+  '/api/chat/track',
+  '/api/chat-lead',
 ]);
 
 function parseCookies(header) {
@@ -301,6 +307,9 @@ app.get(['/admin', '/admin.html'], (req, res) => {
 // Public legal / support pages: static HTML, no session required.
 const PUBLIC_PAGES = {
   '/privacy-policy': 'privacy-policy.html',
+  '/privacy': 'privacy-policy.html',
+  '/terms': 'terms.html',
+  '/terms-of-service': 'terms.html',
   '/refund-and-cancellation': 'refund-and-cancellation.html',
   '/contact': 'contact.html',
 };
@@ -1191,6 +1200,58 @@ app.delete('/api/admin/number-pool/:id', (req, res) => {
   if (!result.ok) return sendPoolError(res, result.reason);
   console.log(`[admin] pool number id=${result.deleted_id} deleted`);
   res.json({ ok: true, deleted_id: result.deleted_id, counts: result.counts, message: 'Number removed from the pool.' });
+});
+
+/* ---------------- public chat widget (no session required) ---------------- */
+app.post('/api/chat/track', (req, res) => {
+  const body = req.body || {};
+  const sessionId = body.sessionId;
+  const pagePath = String(body.path || req.get('referer') || '/').slice(0, 300);
+  try {
+    if (String(body.kind || '').toLowerCase() === 'page_view') {
+      chatAnalytics.recordPageView({ path: pagePath, referrer: body.referrer, sessionId });
+    } else {
+      chatAnalytics.recordEvent({ event: body.event, path: pagePath, sessionId, detail: body.detail });
+    }
+  } catch (err) {
+    console.warn(`[chat] track failed: ${err?.message || err}`);
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/chat-lead', (req, res) => {
+  const body = req.body || {};
+  // Honeypot: bots fill the hidden field. Acknowledge quietly, store nothing.
+  if (String(body.website || '').trim()) return res.json({ ok: true, stored: false });
+
+  const name = String(body.name || '').trim();
+  const contact = String(body.contact || '').trim();
+  if (name.length < 2 || contact.length < 3) {
+    return res.status(400).json({
+      ok: false,
+      error: 'missing_fields',
+      message: 'Please add your name and a phone number or email.',
+    });
+  }
+
+  const lead = chatAnalytics.recordLead({
+    name,
+    contact,
+    businessTrade: body.business_trade,
+    cityZip: body.city_zip,
+    message: body.message,
+    path: body.path || req.get('referer'),
+    sessionId: body.sessionId,
+  });
+
+  if (!lead) {
+    return res.status(503).json({ ok: false, error: 'lead_not_stored', message: 'Please try again in a moment.' });
+  }
+
+  chatAnalytics.recordEvent({ event: 'lead_submitted', path: body.path, sessionId: body.sessionId, detail: body.business_trade });
+  // Log the reference + trade only — never the caller's personal details.
+  console.log(`[chat] lead ${lead.id} trade=${String(body.business_trade || '-').slice(0, 40)}`);
+  res.status(201).json({ ok: true, id: lead.id });
 });
 
 app.get('/api/health', (_req, res) => {
