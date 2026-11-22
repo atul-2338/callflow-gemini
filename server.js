@@ -137,6 +137,51 @@ function sessionForRequest(req) {
   return { token, session, plumber };
 }
 
+// ---------------------------------------------------------------------------
+// Checkout return recovery
+//
+// Dodo sends the browser back to /app?billing=success. The shop session cookie
+// is normally still there, but a cross-site redirect (or apex vs www) can drop
+// it — which used to bounce the owner to the login/save-details form. A short
+// lived `cf_checkout` cookie is set when the checkout is created, so the return
+// can always be tied back to the shop that paid.
+// ---------------------------------------------------------------------------
+const CHECKOUT_COOKIE = 'cf_checkout';
+const CHECKOUT_TTL_MS = 2 * 60 * 60 * 1000;
+
+function checkoutCookie(plumberId) {
+  const parts = [
+    `${CHECKOUT_COOKIE}=${encodeURIComponent(plumberId)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${Math.floor(CHECKOUT_TTL_MS / 1000)}`,
+  ];
+  if (cookieSecure) parts.push('Secure');
+  return parts.join('; ');
+}
+
+function clearCheckoutCookie(res) {
+  const parts = [`${CHECKOUT_COOKIE}=`, 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
+  if (cookieSecure) parts.push('Secure');
+  res.append('Set-Cookie', parts.join('; '));
+}
+
+// Re-establishes the shop session from the checkout cookie. Returns the shop
+// user row on success so a checkout return never lands on "save your details".
+function recoverSessionFromCheckout(req, res) {
+  const plumberId = parseCookies(req.headers.cookie)[CHECKOUT_COOKIE];
+  if (!plumberId) return null;
+  const plumber = store.getPlumberById(String(plumberId));
+  if (!plumber) { clearCheckoutCookie(res); return null; }
+  const shopUser = store.db.prepare('SELECT * FROM shop_users WHERE plumber_id = ? LIMIT 1').get(plumber.id);
+  if (!shopUser) { clearCheckoutCookie(res); return null; }
+  startSession(res, shopUser);
+  clearCheckoutCookie(res);
+  console.log(`[auth] session recovered from checkout cookie for plumber=${plumber.id}`);
+  return shopUser;
+}
+
 function authMiddleware(req, _res, next) {
   const auth = sessionForRequest(req);
   if (auth) {
@@ -286,6 +331,11 @@ app.use('/api/admin', (req, res, next) => {
 
 // Public marketing at `/`; authenticated workspace at `/app`.
 app.get(['/app', '/app.html'], (req, res) => {
+  // Returning from Dodo with a dropped session: recover it from the checkout
+  // cookie and redirect to the clean URL instead of sending them to login.
+  if ((!req.auth || !req.plumber) && recoverSessionFromCheckout(req, res)) {
+    return res.redirect('/app');
+  }
   if (!req.auth || !req.plumber) return res.redirect('/?login=1');
   res.set('Cache-Control', 'no-store');
   // Disabled businesses (admin supervision toggle) never reach the workspace.
@@ -1388,12 +1438,82 @@ app.get('/api/bootstrap', (req, res) => {
       steps,
       completed_steps: steps.filter((step) => step.complete).map((step) => step.key),
       complete: steps.every((step) => step.complete),
+      // The dashboard gate is about DETAILS, never about webhook timing. A shop
+      // that already saved its details is never sent back to the form just
+      // because the subscription webhook has not landed yet.
+      details_saved: hasShopDetails,
+      needs_details: !hasShopDetails,
+      subscription_status: subscription ? subscription.status : plan.subscription_status,
       has_shop_details: hasShopDetails,
       has_email: emailResolved,
       has_forwarding: hasForwarding,
       has_push: hasPush,
       plan_active: planActive,
     },
+  });
+});
+
+// ── Post-checkout subscription sync ─────────────────────────────────────────
+// Best-effort pull from Dodo so the paid plan appears the moment the browser
+// returns, instead of waiting for the subscription.* webhook. Never fatal.
+async function syncDodoSubscription(plumber) {
+  const apiKey = String(process.env.DODO_API_KEY || '').trim();
+  if (!apiKey) return { ok: false, reason: 'not_configured' };
+  const current = store.getPlumberSubscription(plumber.id);
+  const headers = { Authorization: 'Bearer ' + apiKey, Accept: 'application/json' };
+  const base = dodoApiBaseUrl();
+  try {
+    let remote = null;
+    if (current && current.dodo_subscription_id) {
+      const response = await fetch(`${base}/subscriptions/${encodeURIComponent(current.dodo_subscription_id)}`, { headers, signal: AbortSignal.timeout(8000) });
+      if (response.ok) remote = await response.json().catch(() => null);
+    }
+    if (!remote && current && current.dodo_customer_id) {
+      const response = await fetch(`${base}/subscriptions?customer_id=${encodeURIComponent(current.dodo_customer_id)}&page_size=5`, { headers, signal: AbortSignal.timeout(8000) });
+      if (response.ok) {
+        const json = await response.json().catch(() => null);
+        const list = Array.isArray(json) ? json : (json && (json.items || json.data || json.results)) || [];
+        remote = list[0] || null;
+      }
+    }
+    if (!remote) return { ok: false, reason: 'no_remote_subscription' };
+
+    const status = String(remote.status || '').toLowerCase();
+    if (!DODO_SUBSCRIPTION_STATUSES.includes(status)) return { ok: false, reason: 'unmapped_status', remote_status: status };
+
+    const includedRaw = remote.included_minutes ?? (remote.metadata && remote.metadata.included_minutes);
+    const includedMinutes = includedRaw !== undefined && includedRaw !== null && includedRaw !== '' && Number.isFinite(Number(includedRaw))
+      ? Math.max(0, Math.round(Number(includedRaw)))
+      : null;
+
+    store.upsertDodoSubscription({
+      plumberId: plumber.id,
+      dodoCustomerId: remote.customer_id || (remote.customer && (remote.customer.customer_id || remote.customer.id)) || (current && current.dodo_customer_id) || null,
+      dodoSubscriptionId: remote.subscription_id || remote.id || (current && current.dodo_subscription_id) || null,
+      planCode: (current && current.plan_code) || 'solo_99',
+      status,
+      includedMinutes,
+      currentPeriodEnd: remote.next_billing_date || remote.current_period_end || remote.current_period_end_at || null,
+    });
+    return { ok: true, status };
+  } catch (err) {
+    return { ok: false, reason: err && err.name === 'TimeoutError' ? 'request_timeout' : 'request_failed' };
+  }
+}
+
+app.get('/api/billing/sync', async (req, res) => {
+  const result = await syncDodoSubscription(req.plumber);
+  if (result.ok) console.log(`[billing] synced plumber=${req.plumber.id} status=${result.status}`);
+  else console.log(`[billing] sync skipped plumber=${req.plumber.id} reason=${result.reason}`);
+  const fresh = store.getPlumberById(req.plumber.id) || req.plumber;
+  const plan = store.planSnapshot(fresh);
+  res.json({
+    ok: true,
+    synced: result.ok,
+    reason: result.reason || null,
+    status: plan.subscription_status,
+    plan_type: plan.plan_type,
+    is_paid: plan.is_paid,
   });
 });
 
@@ -1456,7 +1576,12 @@ app.post('/api/billing/checkout', async (req, res) => {
   }
 
   const plumber = req.plumber;
-  const returnUrl = new URL('/app?billing=success', appBaseUrl(req)).toString();
+  // Carry the shop id on the return URL as well as in the cookie, so the
+  // post-checkout page can always resolve which shop just paid.
+  const returnUrlObj = new URL('/app?billing=success', appBaseUrl(req));
+  returnUrlObj.searchParams.set('plumber', plumber.id);
+  returnUrlObj.searchParams.set('plan', planCode);
+  const returnUrl = returnUrlObj.toString();
   const currency = checkoutCurrency();
   const address = billingAddress();
   const prefill = buildCustomerPrefill(plumber);
@@ -1516,6 +1641,8 @@ app.post('/api/billing/checkout', async (req, res) => {
       phoneNumber: prefill.customer.phone_number,
     });
     console.log('[billing] checkout session created ' + JSON.stringify({ plumberId: plumber.id, planCode, sessionId, returnUrl, mode: config.mode, currency, billingAddress: address, customerName: prefill.customer.name, customerNameSource: prefill.nameSource, customerEmailSource: prefill.emailSource, customerRecord }));
+    // Ties the checkout return back to this shop even if the session cookie is lost.
+    res.append('Set-Cookie', checkoutCookie(plumber.id));
     res.json({ ok: true, checkoutUrl, sessionId, planCode, returnUrl, mode: config.mode, currency, billingAddress: address, customerName: prefill.customer.name, customerNameSource: prefill.nameSource, customerPrefill: prefill.emailSource, customerRecord });
   } catch (err) {
     const reason = err && err.name === 'TimeoutError' ? 'request_timeout' : 'request_failed';
@@ -1714,7 +1841,7 @@ app.post('/webhooks/dograh/lead', async (req, res) => {
   res.json({ ok: true, lead: result.lead, push, eventId, extracted, matchedBy: result.matched_by || null });
 });
 
-app.post('/webhooks/dodo', (req, res) => {
+app.post('/webhooks/dodo', async (req, res) => {
   const startedAt = Date.now();
   const bodyBuffer = req.rawBodyBuffer || Buffer.from(req.rawBody || '', 'utf8');
   const verification = verifyDodoSignature(req, bodyBuffer, process.env.DODO_WEBHOOK_SECRET);
@@ -1762,8 +1889,32 @@ app.post('/webhooks/dodo', (req, res) => {
     return res.json({ ok: true, duplicate: true, eventId });
   }
 
-  // Billing events we do not model (payments, refunds, disputes, ...) are
-  // acknowledged and archived without touching subscription state.
+  // `payment.succeeded` can arrive before or instead of subscription.* on some
+  // checkout flows. Use it to pull the new subscription state immediately, so
+  // the owner sees the paid plan without waiting for a second webhook.
+  if (eventType === 'payment.succeeded') {
+    const hintId = metadata.plumber_id || data.plumber_id || null;
+    const target = hintId ? store.findPlumberForDodo({ plumberId: hintId }) : null;
+    if (target) {
+      const sync = await syncDodoSubscription(target);
+      store.markWebhookProcessed(eventId, sync.ok ? null : 'sync:' + (sync.reason || 'unknown'));
+      logWebhook({
+        outcome: 'payment_sync',
+        source: 'dodo',
+        eventId,
+        eventType,
+        plumberId: target.id,
+        synced: sync.ok,
+        status: sync.status || null,
+        reason: sync.reason || null,
+        durationMs: Date.now() - startedAt,
+      });
+      return res.json({ ok: true, synced: sync.ok, status: sync.status || null, eventId });
+    }
+  }
+
+  // Billing events we do not model (refunds, disputes, ...) are acknowledged
+  // and archived without touching subscription state.
   if (!eventType.startsWith('subscription.')) {
     store.markWebhookProcessed(eventId, null);
     logWebhook({ outcome: 'ignored_event', source: 'dodo', eventId, eventType });

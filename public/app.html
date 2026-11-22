@@ -2608,10 +2608,47 @@
       }, 45000);
 
       (async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const returnedFromCheckout = params.get('billing') === 'success';
+
+        // Returning from Dodo: pull the subscription state immediately, then
+        // strip the query string so a refresh cannot re-run the return flow.
+        if (returnedFromCheckout) {
+          setLive('Payment received — activating your Solo plan…');
+          try { await fetch('/api/billing/sync', { cache: 'no-store' }); } catch { /* ignore */ }
+          ['billing', 'plumber', 'plan', 'checkout'].forEach((key) => params.delete(key));
+          const query = params.toString();
+          try {
+            window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+          } catch { /* ignore */ }
+          if (typeof loadBilling === 'function') { try { await loadBilling(false); } catch { /* ignore */ } }
+        }
+
         const data = await refreshSetup();
         if (!data || !data.plumber) return;
-        const incomplete = !data.onboarding || data.onboarding.complete === false;
-        if (!incomplete) return;
+
+        const onboarding = data.onboarding || {};
+        const detailsSaved = onboarding.details_saved !== undefined
+          ? Boolean(onboarding.details_saved)
+          : Boolean(onboarding.has_shop_details);
+
+        // Details already on file (this includes every post-checkout return):
+        // stay on the dashboard. Only a genuinely new shop sees the details form.
+        if (detailsSaved) {
+          if (returnedFromCheckout) {
+            const status = data.billing ? data.billing.status : null;
+            setLive(status === 'active'
+              ? 'Solo plan active — you are all set.'
+              : 'Payment received — activating your plan as soon as Dodo confirms.');
+            if (status !== 'active') {
+              window.setTimeout(() => {
+                if (!document.hidden) { refreshSetup(); if (typeof loadBilling === 'function') loadBilling(false); }
+              }, 5000);
+            }
+          }
+          return;
+        }
+
         let seen = null;
         try { seen = localStorage.getItem(keyFor(ONBOARD_KEY)); } catch { /* ignore */ }
         if (!seen) openWizard('shop');
